@@ -29,6 +29,17 @@ impl Board {
         self.b[7][3] = -6;
         self.b[7][4] = -5;
     }
+
+    pub fn get_piece(&self, one: i32, two: i32) -> i32 {
+        // Get a piece from the board at b[one][two]
+
+        // Cast to correct type for indexing
+        let one_usize: usize = one as usize;
+        let two_usize: usize = two as usize;
+
+        return self.b[one_usize][two_usize];
+
+    }
     pub fn bound_check(&self, moves: Vec<[i32; 2]>) -> Vec<[i32; 2]> {
         // Checks two things:
         // 1: is move on the board ( 0 =< x/y <= 7)
@@ -95,7 +106,7 @@ fn sign_checker(one: i32, two: i32) -> bool {
 
 pub trait Moves {
     // Empty methods to overwrite by each piece
-    fn move_set(&self) -> Vec<[i32; 2]> {
+    fn move_set(&self, board: &Board) -> Vec<[i32; 2]> {
         let val: Vec<[i32; 2]> = Vec::new();
         return val;
     }
@@ -110,7 +121,7 @@ impl Moves for Pawn {
     // has 4 possible moves:
     // +2 (Special case), +1, +1-1, +1+1
 
-    fn move_set(&self, board: Board) -> Vec<[i32; 2]> {
+    fn move_set(&self, board: &Board) -> Vec<[i32; 2]> {
         let mut direction = 1; 
 
         if self.key == -1 {
@@ -134,21 +145,18 @@ impl Moves for Pawn {
         let mut valid: Vec<[i32; 2]> = Vec::new();
         if (self.pos[1] + 1) != 8 {
             valid.push([self.pos[0] + 1 * direction, self.pos[1] + 1]);
-        } if (self.pos[1] 01 1) != -1 {
+        } if (self.pos[1] - 1) != -1 {
             valid.push([self.pos[0] + 1 * direction, self.pos[1] - 1]);
         }
 
         // Now that we have the valid moves, check if they are legal
         for i in 0..valid.len() {
-            // if valid[i][]
+            let diagonal: i32 = board.get_piece(valid[i][0], valid[i][1]);
+            if sign_checker(self.key, diagonal) {
+                all_moves.push(valid[i]);
+            }
         }
         return all_moves;
-    }
-
-    // Calls move_set and removes impossible moves
-    fn open_moves(&mut self, board: Board) -> () {
-        let mut moves: Vec<[i32; 2]> = self.move_set();
-
     }
 }
 
