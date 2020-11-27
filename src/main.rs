@@ -1,6 +1,7 @@
 use std::io;
 use std::io::Write;
 mod pieces;
+use crate::pieces::Moves;
 
 /*
 Board construction:
@@ -32,9 +33,8 @@ Each piece is a heap allocated trait
 fn main() {
 
     // Create a board         
-    let empty: pieces::Empty = pieces::Empty{pos: [0, 0], key: 0};
     let mut board = pieces::Board{
-        b: [[Box::new(empty); 8]; 8]
+        b: [[0; 8]; 8]
     }; 
 
     // Construct the board
@@ -43,15 +43,26 @@ fn main() {
     // print the board
     for i in 0..8 {
         for j in 0..8 {
-            if board.b[i][j].get_key() >= 0 {
-                print!("  {}", board.b[i][j].get_key());
+            if board.b[i][j] >= 0 {
+                print!("  {}", board.b[i][j]);
 
             } else {
-                print!(" {}", board.b[i][j].get_key());
+                print!(" {}", board.b[i][j]);
             }
         }
         io::stdout().flush().unwrap();
         println!("");
     }
 
+    let pawn: pieces::Pawn = pieces::Pawn{pos: [1, 1], key: 1};
+    let out: Vec<[i8; 2]> = pawn.move_set(&board);
+    for i in 0..out.len() {
+        println!("{:?}", out[i]);
+    }
+    println!("");
+
+    let valid: Vec<[i8; 2]> = board.bound_check(out);
+    for i in 0..valid.len() {
+        println!("{:?}", valid[i]);
+    }
 }

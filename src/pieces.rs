@@ -4,7 +4,7 @@ This file holds the classes of each piece and their respective moves
 
 
 pub struct Board {
-    pub b: [[i32; 8]; 8]
+    pub b: [[i8; 8]; 8]
 }
 
 impl Board {
@@ -30,7 +30,7 @@ impl Board {
         self.b[7][4] = -5;
     }
 
-    pub fn get_piece(&self, one: i32, two: i32) -> i32 {
+    pub fn get_piece(&self, one: i8, two: i8) -> i8 {
         // Get a piece from the board at b[one][two]
 
         // Cast to correct type for indexing
@@ -40,19 +40,19 @@ impl Board {
         return self.b[one_usize][two_usize];
 
     }
-    pub fn bound_check(&self, moves: Vec<[i32; 2]>) -> Vec<[i32; 2]> {
+    pub fn bound_check(&self, moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
         // Checks two things:
         // 1: is move on the board ( 0 =< x/y <= 7)
         // 2: is their a friendly piece at the position
 
-        let mut valid: Vec<[i32; 2]> = Vec::new();
+        let mut valid: Vec<[i8; 2]> = Vec::new();
         for i in 0..moves.len() {
             if (8 > moves[i][0] && moves[i][0] > -1) && (8 > moves[i][1] && moves[i][1] > -1) {
                 valid.push(moves[i]);
             }
         }
 
-        let mut empty: Vec<[i32; 2]> = Vec::new();
+        let mut empty: Vec<[i8; 2]> = Vec::new();
         for i in 0..valid.len() {
             if self.b[valid[i][0] as usize][valid[i][1] as usize] == 0 {
                 empty.push(valid[i]);
@@ -64,36 +64,36 @@ impl Board {
 
 
 pub struct Pawn {
-    pub pos: [i32; 2],
-    pub key: i32
+    pub pos: [i8; 2],
+    pub key: i8
 }
 
 struct Tower {
-    pos: [i32; 2],
-    key: i32
+    pos: [i8; 2],
+    key: i8
 }
 
 // struct Knight {
-//     pos: [i32; 2],
-//     key: i32
+//     pos: [i8; 2],
+//     key: i8
 // }
 
 // struct Bishop {
-//     pos: [i32; 2],
-//     key: i32
+//     pos: [i8; 2],
+//     key: i8
 // }
 
 // struct King {
-//     pos: [i32; 2],
-//     key: i32
+//     pos: [i8; 2],
+//     key: i8
 // }
 
 // pub struct Queen {
-//     pos: [i32; 2],
-//     pub key: i32
+//     pos: [i8; 2],
+//     pub key: i8
 // }
 
-fn sign_checker(one: i32, two: i32) -> bool {
+fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
     // else return false
 
@@ -106,8 +106,8 @@ fn sign_checker(one: i32, two: i32) -> bool {
 
 pub trait Moves {
     // Empty methods to overwrite by each piece
-    fn move_set(&self, board: &Board) -> Vec<[i32; 2]> {
-        let val: Vec<[i32; 2]> = Vec::new();
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+        let val: Vec<[i8; 2]> = Vec::new();
         return val;
     }
 
@@ -121,28 +121,35 @@ impl Moves for Pawn {
     // has 4 possible moves:
     // +2 (Special case), +1, +1-1, +1+1
 
-    fn move_set(&self, board: &Board) -> Vec<[i32; 2]> {
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
         let mut direction = 1; 
 
         if self.key == -1 {
             direction = -1;
         }
         // A vector that holds all possible moves for a Pawn at pos [x][y]
-        let mut all_moves: Vec<[i32; 2]> = Vec::new();
+        let mut all_moves: Vec<[i8; 2]> = Vec::new();
+        let mut valid: Vec<[i8; 2]> = Vec::new();
 
         // Check if Pawn can move 2 spaces
         if (self.pos[1] == 6 && self.key == -1) || self.pos[1] == 1 {
-            all_moves.push([self.pos[0] + direction * 2, self.pos[1]]);
+            valid.push([self.pos[0] + direction * 2, self.pos[1]]);
         }
 
         // Move forward 1 
-        all_moves.push([self.pos[0] + 1 * direction, self.pos[1]]);
+        valid.push([self.pos[0] + 1 * direction, self.pos[1]]);
+
+        // Does a piece occupy a position where the pawn would move?
+        for i in 0..valid.len() {
+            if board.get_piece(valid[i][0], valid[i][1]) == 0 {
+                all_moves.push(valid[i]);
+            }
+        }
+        valid.clear();
 
         // Check if an oppenent is in the diagonal
-
         // Pawn has attack seperate from regular move, so i'll do bound 
         // checking within the function
-        let mut valid: Vec<[i32; 2]> = Vec::new();
         if (self.pos[1] + 1) != 8 {
             valid.push([self.pos[0] + 1 * direction, self.pos[1] + 1]);
         } if (self.pos[1] - 1) != -1 {
@@ -151,8 +158,8 @@ impl Moves for Pawn {
 
         // Now that we have the valid moves, check if they are legal
         for i in 0..valid.len() {
-            let diagonal: i32 = board.get_piece(valid[i][0], valid[i][1]);
-            if sign_checker(self.key, diagonal) {
+            let diagonal: i8 = board.get_piece(valid[i][0], valid[i][1]);
+            if !sign_checker(self.key, diagonal) {
                 all_moves.push(valid[i]);
             }
         }
