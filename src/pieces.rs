@@ -128,9 +128,20 @@ impl Moves for Pawn {
         all_moves.push([self.pos[0] + 1 * direction, self.pos[1]]);
 
         // Check if an oppenent is in the diagonal
-        all_moves.push([self.pos[0] + 1 * direction, self.pos[1] - 1]);
-        all_moves.push([self.pos[0] + 1 * direction, self.pos[1] + 1]);
 
+        // Pawn has attack seperate from regular move, so i'll do bound 
+        // checking within the function
+        let mut valid: Vec<[i32; 2]> = Vec::new();
+        if (self.pos[1] + 1) != 8 {
+            valid.push([self.pos[0] + 1 * direction, self.pos[1] + 1]);
+        } if (self.pos[1] 01 1) != -1 {
+            valid.push([self.pos[0] + 1 * direction, self.pos[1] - 1]);
+        }
+
+        // Now that we have the valid moves, check if they are legal
+        for i in 0..valid.len() {
+            // if valid[i][]
+        }
         return all_moves;
     }
 
