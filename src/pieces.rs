@@ -17,12 +17,14 @@ impl Board {
 
         // put non pawns on the board
         let mut start = 2;
+        let mut change = 1;
         for i in 0..8 {
             self.b[0][i] = start;
             self.b[7][i] = start * -1;
-            start += 1;
-            if start == 6 {
-                start -= 2;
+            start += change;
+            if start == 7 {
+                start -= 3;
+                change = -1;
             }
         }
         // King and queen should be on opposite sides
@@ -68,9 +70,9 @@ pub struct Pawn {
     pub key: i8
 }
 
-struct Tower {
-    pos: [i8; 2],
-    key: i8
+pub struct Tower {
+    pub pos: [i8; 2],
+    pub key: i8
 }
 
 // struct Knight {
@@ -96,7 +98,9 @@ struct Tower {
 fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
     // else return false
-
+    if two == 0 {
+        return true;
+    }
     if one > 0 && two > 0 {
         return true;
     } else if one < 0 && two < 0 {
@@ -106,12 +110,12 @@ fn sign_checker(one: i8, two: i8) -> bool {
 
 pub trait Moves {
     // Empty methods to overwrite by each piece
-    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+    fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;
     }
 
-    fn open_moves(&mut self, board: Board) {
+    fn open_moves(&mut self, _board: Board) {
         return;
     }
 }
@@ -132,9 +136,12 @@ impl Moves for Pawn {
         let mut valid: Vec<[i8; 2]> = Vec::new();
 
         // Check if Pawn can move 2 spaces
-        if (self.pos[1] == 6 && self.key == -1) || self.pos[1] == 1 {
+        if (self.pos[0] == 6 && self.key == -1) || (self.pos[0] == 1 && self.key == 1) {
             valid.push([self.pos[0] + direction * 2, self.pos[1]]);
         }
+
+        // Edge case: Pawn reaches end of board causes array issue
+        // shoudn't be an issue once upgrading pawns is implimented
 
         // Move forward 1 
         valid.push([self.pos[0] + 1 * direction, self.pos[1]]);
@@ -151,14 +158,15 @@ impl Moves for Pawn {
         // Pawn has attack seperate from regular move, so i'll do bound 
         // checking within the function
         if (self.pos[1] + 1) != 8 {
-            valid.push([self.pos[0] + 1 * direction, self.pos[1] + 1]);
+            valid.push([self.pos[0] + (1 * direction), self.pos[1] + 1]);
         } if (self.pos[1] - 1) != -1 {
-            valid.push([self.pos[0] + 1 * direction, self.pos[1] - 1]);
+            valid.push([self.pos[0] + (1 * direction), self.pos[1] - 1]);
         }
 
         // Now that we have the valid moves, check if they are legal
         for i in 0..valid.len() {
             let diagonal: i8 = board.get_piece(valid[i][0], valid[i][1]);
+            println!("self: {}, dia: {}", self.key, diagonal);
             if !sign_checker(self.key, diagonal) {
                 all_moves.push(valid[i]);
             }
@@ -168,10 +176,73 @@ impl Moves for Pawn {
 }
 
 impl Moves for Tower {
-    fn open_moves(&mut self, board: Board){
-        if self.key == -1 {
-            println!("Yes");
+    // Can move NSEW, till it reaches a piece of border
+
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+        let mut moves: Vec<[i8; 2]> = Vec::new();
+        // Using 4 vectors and appending makes the output in order instead of mangled
+        let mut moves_0: Vec<[i8; 2]> = Vec::new();
+        let mut moves_1: Vec<[i8; 2]> = Vec::new();
+        let mut moves_2: Vec<[i8; 2]> = Vec::new();
+        let mut moves_3: Vec<[i8; 2]> = Vec::new();
+        // TODO: Condese into a single vec once debugging is done
+
+        // flag is set to false if piece is encoutered
+        let mut flags: [bool; 4] = [true; 4];
+        let x = self.pos[1];
+        let y = self.pos[0];
+
+        // Check if possible move is inbounds and if move is not behind another piece
+        // Then check if a piece occupys that space. If one is there set flag to false
+        // and check if piece is enemy or friedly, otherwise space is open
+        // Do check for each direction
+        for i in 1..9 {
+            if x + i < 8 && flags[0] {
+
+                if board.b[y as usize][(x + i) as usize] != 0  {
+                    flags[0] = false;
+                    if !sign_checker(self.key, board.b[y as usize][(x + i) as usize]) {
+                        moves_0.push([y, x + i]);
+                    }
+                } else {
+                    moves_0.push([y, x + i]);
+                }
+            } if x - i > -1 && flags[1] {
+                if board.b[y as usize][(x - i) as usize] != 0 {
+                    flags[1] = false;
+                    if !sign_checker(self.key, board.b[y as usize][(x - i) as usize]) {
+                        moves_1.push([y, x - i]);
+                    }
+                } else {
+                    moves_1.push([y, x - i]);
+                }
+            } if y + i < 8 && flags[2] {
+                if board.b[(y + i) as usize][x as usize] != 0 {
+                    flags[2] = false;
+                    if !sign_checker(self.key, board.b[(y + i) as usize][x as usize]) {
+                        moves_2.push([y + i, x]);
+                    }
+                } else {
+                    moves_2.push([y + i, x]);
+                }
+            } if y - i > -1 && flags[3] {
+                if board.b[(y - i) as usize][x as usize] != 0 {
+                    flags[3] = false;
+                    if !sign_checker(self.key, board.b[(y - i) as usize][x as usize]) {
+                        moves_3.push([y - i, x]);
+                    }
+                } else {
+                    moves_3.push([y - i, x]);
+                }
+            }
         }
+        
+        moves.append(&mut moves_0);
+        moves.append(&mut moves_1);
+        moves.append(&mut moves_2);
+        moves.append(&mut moves_3);
+
+        return moves;
 
     }
 }
