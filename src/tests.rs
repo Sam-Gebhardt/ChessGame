@@ -55,8 +55,26 @@ mod tests {
         let pawn_2: Pawn = Pawn{pos: [6, 4], key: -1};
         assert_eq!(pawn_2.move_set(&board), vec!([4, 4], [5, 4], [5, 5]));
 
+        // Add testcase for no valid moves
         // let pawn_3: Pawn = Pawn{pos: [1, 0], key: 1};
         // let pawn_4: Pawn = Pawn{pos: [1, 0], key: 1};
+    }
+    #[test]
+    fn tower_moves() {
+        // Create a standard board
+        let mut board = Board{
+            b: [[0; 8]; 8]
+        }; 
+        board.construct();
+
+        // No possible moves at starting position
+        let tower: Tower = Tower{pos: [0, 0], key: 2};
+        let tower_1: Tower = Tower{pos: [7, 7], key: -2};
+
+        let empty: Vec<[i8; 2]> = Vec::new();
+        assert_eq!(tower.move_set(&board), empty);
+        assert_eq!(tower_1.move_set(&board), empty);
+
     }
 }
 
