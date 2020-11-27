@@ -75,6 +75,18 @@ mod tests {
         assert_eq!(tower.move_set(&board), empty);
         assert_eq!(tower_1.move_set(&board), empty);
 
+        board.b[5][3] = 2;
+        let tower_2: Tower = Tower{pos: [5, 3], key: -2};
+        // test bounds and enemy vs friendly detection
+
+        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 5], [5, 6], [5, 7], [5, 2], 
+                                                  [5, 1], [5, 0], [4, 3], [3, 3], [2, 3],
+                                                  [1, 3]));
+
+        board.b[3][3] = -1;
+        board.b[5][1] = 1;
+        board.b[5][6] = 1;
+        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 5], [5, 6], [5, 2], [5, 1], [4, 3]));
     }
 }
 
