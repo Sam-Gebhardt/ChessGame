@@ -75,10 +75,10 @@ pub struct Tower {
     pub key: i8
 }
 
-// struct Knight {
-//     pos: [i8; 2],
-//     key: i8
-// }
+pub struct Knight {
+    pub pos: [i8; 2],
+    pub key: i8
+}
 
 // struct Bishop {
 //     pos: [i8; 2],
@@ -176,7 +176,7 @@ impl Moves for Pawn {
 }
 
 impl Moves for Tower {
-    // Can move NSEW, till it reaches a piece of border
+    // Can move NSEW, till it reaches a piece or border
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
         let mut moves: Vec<[i8; 2]> = Vec::new();
@@ -185,7 +185,7 @@ impl Moves for Tower {
         let mut moves_1: Vec<[i8; 2]> = Vec::new();
         let mut moves_2: Vec<[i8; 2]> = Vec::new();
         let mut moves_3: Vec<[i8; 2]> = Vec::new();
-        // TODO: Condese into a single vec once debugging is done
+        // TODO: Condense into a single vec once debugging is done
 
         // flag is set to false if piece is encoutered
         let mut flags: [bool; 4] = [true; 4];
@@ -243,18 +243,17 @@ impl Moves for Tower {
         moves.append(&mut moves_3);
 
         return moves;
-
     }
 }
 
-// impl Moves for Knight {
-//     fn open_moves(&mut self, board: Board) {
-//         if self.key == -1 {
-//             println!("Yes");
-//         }
+impl Moves for Knight {
+    fn open_moves(&self, board: &Board) -> Vec[i8; 2]> {
+        // Can move in an L shape, 8 possible moves
+        let mut moves: Vec<[i8; 2]> = Vec::new();
 
-//     }
-// }
+
+    }
+}
 
 // impl Moves for Bishop {
 //     fn open_moves(&mut self, board: Board) {
