@@ -2,6 +2,20 @@
 This file holds the classes of each piece and their respective moves
 */
 
+fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
+    let abs_key = key.abs();
+    let t: Box<dyn Moves> = match abs_key {
+        1 => Box::new(Pawn{pos: pos, key: key}),
+        2 => Box::new(Tower{pos: pos, key: key}),
+        3 => Box::new(Knight{pos: pos, key: key}),
+        4 => Box::new(Bishop{pos: pos, key: key}),
+        5 => Box::new(King{pos: pos, key: key}),
+        6 => Box::new(Queen{pos: pos, key: key}),
+        _ => Box::new(Pawn{pos: pos, key: key}),
+    };
+    return t;
+}
+
 
 pub struct Board {
     pub b: [[i8; 8]; 8]
@@ -40,7 +54,25 @@ impl Board {
         let two_usize: usize = two as usize;
 
         return self.b[one_usize][two_usize];
+    }
 
+    pub fn move_piece(&mut self, src: [i8; 2], dest: [i8; 2]) {
+        // Move a piece from src to dest, set src to 0
+
+        self.b[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
+        self.b[src[0] as usize][src[1] as usize] = 0;
+    }
+
+    fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
+        // See if a move cause a check to happen
+
+        for i in 0..8 {
+            for j in 0..8 {
+                let piece = piece_type(self.get_piece(i, j), [i, j]);
+            
+            }
+        }
+        return true;
     }
 }
 
@@ -173,39 +205,39 @@ impl Moves for Tower {
         // Then check if a piece occupys that space. If one is there set flag to false
         // and check if piece is enemy or friedly, otherwise space is open
         // Do check for each direction
-        for i in 1..9 { //TODO: use board.get_piece()
+        for i in 1..9 { 
             if x + i < 8 && flags[0] {
 
-                if board.b[y as usize][(x + i) as usize] != 0  {
+                if board.get_piece(y, x + i) != 0  {
                     flags[0] = false;
-                    if !sign_checker(self.key, board.b[y as usize][(x + i) as usize]) {
+                    if !sign_checker(self.key, board.get_piece(y, x + i)) {
                         moves_0.push([y, x + i]);
                     }
                 } else {
                     moves_0.push([y, x + i]);
                 }
             } if x - i > -1 && flags[1] {
-                if board.b[y as usize][(x - i) as usize] != 0 {
+                if board.get_piece(y, x - i) != 0 {
                     flags[1] = false;
-                    if !sign_checker(self.key, board.b[y as usize][(x - i) as usize]) {
+                    if !sign_checker(self.key, board.get_piece(y, x - i)) {
                         moves_1.push([y, x - i]);
                     }
                 } else {
                     moves_1.push([y, x - i]);
                 }
             } if y + i < 8 && flags[2] {
-                if board.b[(y + i) as usize][x as usize] != 0 {
+                if board.get_piece(y + i, x) != 0 {
                     flags[2] = false;
-                    if !sign_checker(self.key, board.b[(y + i) as usize][x as usize]) {
+                    if !sign_checker(self.key, board.get_piece(y + i, x)) {
                         moves_2.push([y + i, x]);
                     }
                 } else {
                     moves_2.push([y + i, x]);
                 }
             } if y - i > -1 && flags[3] {
-                if board.b[(y - i) as usize][x as usize] != 0 {
+                if board.get_piece(y - i, x) != 0 {
                     flags[3] = false;
-                    if !sign_checker(self.key, board.b[(y - i) as usize][x as usize]) {
+                    if !sign_checker(self.key, board.get_piece(y - i, x)) {
                         moves_3.push([y - i, x]);
                     }
                 } else {
@@ -376,4 +408,10 @@ Switch to refrences
 Maintain open moves
 Add method to board that moves a piece
 Factor out bound checking and call in each piece
+*/
+
+/*
+
+**Change array of ints to array of boxes**
+
 */

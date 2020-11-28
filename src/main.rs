@@ -1,6 +1,7 @@
 use std::io;
 use std::io::Write;
 mod pieces;
+mod tests;
 use crate::pieces::Moves;
 
 /*
@@ -54,15 +55,15 @@ fn main() {
         println!("");
     }
 
-    let pawn: pieces::Pawn = pieces::Pawn{pos: [1, 1], key: 1};
-    let out: Vec<[i8; 2]> = pawn.move_set(&board);
+    let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
+    let out: Vec<[i8; 2]> = king.move_set(&board);
     for i in 0..out.len() {
         println!("{:?}", out[i]);
     }
     println!("");
 
-    let valid: Vec<[i8; 2]> = board.bound_check(out);
-    for i in 0..valid.len() {
-        println!("{:?}", valid[i]);
-    }
+    // let valid: Vec<[i8; 2]> = board.bound_check(out);
+    // for i in 0..valid.len() {
+    //     println!("{:?}", valid[i]);
+    // }
 }
