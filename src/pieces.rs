@@ -65,10 +65,10 @@ pub struct Bishop {
     pub key: i8
 }
 
-// struct King {
-//     pos: [i8; 2],
-//     key: i8
-// }
+pub struct King {
+    pub pos: [i8; 2],
+    pub key: i8
+}
 
 pub struct Queen {
     pub pos: [i8; 2],
@@ -93,10 +93,6 @@ pub trait Moves {
     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;
-    }
-
-    fn open_moves(&mut self, _board: Board) {
-        return;
     }
 }
 
@@ -135,11 +131,10 @@ impl Moves for Pawn {
         valid.clear();
 
         // Check if an oppenent is in the diagonal
-        // Pawn has attack seperate from regular move, so i'll do bound 
-        // checking within the function
         if (self.pos[1] + 1) != 8 {
             valid.push([self.pos[0] + (1 * direction), self.pos[1] + 1]);
-        } if (self.pos[1] - 1) != -1 {
+        }
+        if (self.pos[1] - 1) != -1 {
             valid.push([self.pos[0] + (1 * direction), self.pos[1] - 1]);
         }
 
@@ -233,6 +228,8 @@ impl Moves for Knight {
         // Can move in an L shape, 8 possible moves
         let mut moves: Vec<[i8; 2]> = Vec::new();
         let mut legal_moves: Vec<[i8; 2]> = Vec::new();
+
+        // All possible moves for knight
         let changes: [[i8; 2]; 8] = [[-2, 1], [-2, -1], [2, 1], [2, -1], 
                                      [1, 2], [-1, 2], [1, -2], [-1, -2]];
         let x = self.pos[1];
@@ -328,13 +325,28 @@ impl Moves for Bishop {
     }
 }
 
-// impl Moves for King {
-//     fn open_moves(&mut self, board: Board) {
-//         if self.key == -1 {
-//             println!("Yes");
-//         }
-//     }
-// }
+impl Moves for King {
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+        let changes: [[i8; 2]; 8] = [[1, 0], [1, -1], [0, -1], [-1, -1], 
+                                   [-1, 0], [-1, 1], [0, 1], [1, 1]];
+        
+        let mut open_moves: Vec<[i8; 2]> = Vec::new();
+        let x = self.pos[1];
+        let y = self.pos[0];
+
+        for i in 0..8 {
+            if y + changes[i][0] > 7 || y + changes[i][0] < 0 
+                || x + changes[i][1] > 7 || x + changes[i][1] < 0 {
+                
+                continue;
+            }
+            if !sign_checker(self.key, board.get_piece(y + changes[i][0], x + changes[i][1])) {
+                open_moves.push([y + changes[i][0], x + changes[i][1]])
+            }
+        }
+        return open_moves;
+    }
+}
 
 impl Moves for Queen {
     // Call tower + bishop 
@@ -350,3 +362,18 @@ impl Moves for Queen {
         return b_moves;
     }
 }
+
+/*
+TODO:
+i8 -> i4
+get method for pos and key
+implement get methods
+make struct attributes private
+Condense vectors in Tower/Bishop
+Castling
+Empty
+Switch to refrences
+Maintain open moves
+Add method to board that moves a piece
+Factor out bound checking and call in each piece
+*/
