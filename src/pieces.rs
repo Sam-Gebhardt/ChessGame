@@ -70,10 +70,10 @@ pub struct Bishop {
 //     key: i8
 // }
 
-// pub struct Queen {
-//     pos: [i8; 2],
-//     pub key: i8
-// }
+pub struct Queen {
+    pub pos: [i8; 2],
+    pub key: i8
+}
 
 fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
@@ -336,12 +336,17 @@ impl Moves for Bishop {
 //     }
 // }
 
-// impl Moves for Queen {
-    // Call tower + bishop = done
-//     fn open_moves(&mut self, board: Board) {
-//         if self.key == -1 {
-//             println!("Yes");
-//         }
+impl Moves for Queen {
+    // Call tower + bishop 
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+        let t: Tower = Tower{pos: self.pos, key: self.key};
+        let b: Bishop = Bishop{pos: self.pos, key: self.key};
 
-//     }
-// }
+        let mut b_moves: Vec<[i8; 2]> = b.move_set(board);
+        let mut t_moves: Vec<[i8; 2]> = t.move_set(board);
+
+        b_moves.append(&mut t_moves);
+
+        return b_moves;
+    }
+}
