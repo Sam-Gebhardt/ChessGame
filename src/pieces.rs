@@ -2,31 +2,17 @@
 This file holds the classes of each piece and their respective moves
 */
 
-fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
-    let abs_key = key.abs();
-    let t: Box<dyn Moves> = match abs_key {
-        1 => Box::new(Pawn{pos: pos, key: key}),
-        2 => Box::new(Tower{pos: pos, key: key}),
-        3 => Box::new(Knight{pos: pos, key: key}),
-        4 => Box::new(Bishop{pos: pos, key: key}),
-        5 => Box::new(King{pos: pos, key: key}),
-        6 => Box::new(Queen{pos: pos, key: key}),
-        _ => Box::new(Pawn{pos: pos, key: key}),
-    };
-    return t;
-}
-
 
 pub struct Board {
-    pub b: [[i8; 8]; 8]
+    pub b: [[Box<dyn Moves>; 8]; 8]
 }
 
 impl Board {
     pub fn construct(&mut self) { //Fill the board with pieces
         // put the pawns on the board
         for i in 0..8 {
-            self.b[1][i] = 1;
-            self.b[6][i] = -1;
+            self.b[1][i] = Box::new(Pawn{pos: [1, i as i8], key: 1});
+            self.b[6][i] = Box::new(Pawn{pos: [6, i as i8], key: -1});
         }
 
         // put non pawns on the board
@@ -42,8 +28,8 @@ impl Board {
             }
         }
         // King and queen should be on opposite sides
-        self.b[7][3] = -6;
-        self.b[7][4] = -5;
+        // self.b[7][3] = -6;
+        // self.b[7][4] = -5;
     }
 
     pub fn get_piece(&self, one: i8, two: i8) -> i8 {
@@ -75,7 +61,9 @@ impl Board {
         return true;
     }
 }
-
+pub struct Empty {
+    pub key: i8
+}
 
 pub struct Pawn {
     pub pos: [i8; 2],
@@ -122,6 +110,14 @@ fn sign_checker(one: i8, two: i8) -> bool {
 
 pub trait Moves {
     // Empty methods to overwrite by each piece
+    fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
+        let val: Vec<[i8; 2]> = Vec::new();
+        return val;
+    }
+}
+
+
+impl Moves for Empty {
     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;

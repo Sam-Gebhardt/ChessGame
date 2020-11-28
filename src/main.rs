@@ -35,32 +35,32 @@ fn main() {
 
     // Create a board         
     let mut board = pieces::Board{
-        b: [[0; 8]; 8]
+        b: [[Box::new(pieces::Empty{key: 0}); 8]; 8]
     }; 
 
     // Construct the board
     board.construct();
 
     // print the board
-    for i in 0..8 {
-        for j in 0..8 {
-            if board.b[i][j] >= 0 {
-                print!("  {}", board.b[i][j]);
+    // for i in 0..8 {
+    //     for j in 0..8 {
+    //         if board.b[i][j] >= 0 {
+    //             print!("  {}", board.b[i][j]);
 
-            } else {
-                print!(" {}", board.b[i][j]);
-            }
-        }
-        io::stdout().flush().unwrap();
-        println!("");
-    }
+    //         } else {
+    //             print!(" {}", board.b[i][j]);
+    //         }
+    //     }
+    //     io::stdout().flush().unwrap();
+    //     println!("");
+    // }
 
-    let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
-    let out: Vec<[i8; 2]> = king.move_set(&board);
-    for i in 0..out.len() {
-        println!("{:?}", out[i]);
-    }
-    println!("");
+    // let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
+    // let out: Vec<[i8; 2]> = king.move_set(&board);
+    // for i in 0..out.len() {
+    //     println!("{:?}", out[i]);
+    // }
+    // println!("");
 
     // let valid: Vec<[i8; 2]> = board.bound_check(out);
     // for i in 0..valid.len() {
