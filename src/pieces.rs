@@ -42,26 +42,6 @@ impl Board {
         return self.b[one_usize][two_usize];
 
     }
-    pub fn bound_check(&self, moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
-        // Checks two things:
-        // 1: is move on the board ( 0 =< x/y <= 7)
-        // 2: is their a friendly piece at the position
-
-        let mut valid: Vec<[i8; 2]> = Vec::new();
-        for i in 0..moves.len() {
-            if (8 > moves[i][0] && moves[i][0] > -1) && (8 > moves[i][1] && moves[i][1] > -1) {
-                valid.push(moves[i]);
-            }
-        }
-
-        let mut empty: Vec<[i8; 2]> = Vec::new();
-        for i in 0..valid.len() {
-            if self.b[valid[i][0] as usize][valid[i][1] as usize] == 0 {
-                empty.push(valid[i]);
-            } 
-        }
-        return valid;
-    }
 }
 
 
@@ -99,7 +79,7 @@ fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
     // else return false
     if two == 0 {
-        return true;
+        return false;
     }
     if one > 0 && two > 0 {
         return true;
@@ -166,12 +146,22 @@ impl Moves for Pawn {
         // Now that we have the valid moves, check if they are legal
         for i in 0..valid.len() {
             let diagonal: i8 = board.get_piece(valid[i][0], valid[i][1]);
-            println!("self: {}, dia: {}", self.key, diagonal);
-            if !sign_checker(self.key, diagonal) {
+
+            // Can't use signal_checker fn because 0 is a special case for Pawns
+            if !((self.key > 0 && diagonal >= 0) || (self.key < 0 && diagonal <= 0)) {
                 all_moves.push(valid[i]);
             }
         }
         return all_moves;
+
+        // if two == 0 {
+        //     return false;
+        // }
+        // if one > 0 && two > 0 {
+        //     return true;
+        // } else if one < 0 && two < 0 {
+        //     return true;
+        // } return false;
     }
 }
 
@@ -196,7 +186,7 @@ impl Moves for Tower {
         // Then check if a piece occupys that space. If one is there set flag to false
         // and check if piece is enemy or friedly, otherwise space is open
         // Do check for each direction
-        for i in 1..9 {
+        for i in 1..9 { //TODO: use board.get_piece()
             if x + i < 8 && flags[0] {
 
                 if board.b[y as usize][(x + i) as usize] != 0  {
@@ -247,11 +237,31 @@ impl Moves for Tower {
 }
 
 impl Moves for Knight {
-    fn open_moves(&self, board: &Board) -> Vec[i8; 2]> {
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
         // Can move in an L shape, 8 possible moves
         let mut moves: Vec<[i8; 2]> = Vec::new();
+        let mut legal_moves: Vec<[i8; 2]> = Vec::new();
+        let changes: [[i8; 2]; 8] = [[-2, 1], [-2, -1], [2, 1], [2, -1], 
+                                     [1, 2], [-1, 2], [1, -2], [-1, -2]];
+        let x = self.pos[1];
+        let y = self.pos[0];
 
+        for i in 0..8 {
+            // Bound check
+            if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 
+                || x + changes[i][1] > 7 || x + changes[i][1] < 0) {
 
+                moves.push([y + changes[i][0], x + changes[i][1]])
+            }
+        }
+
+        for i in 0..moves.len() {
+            if !sign_checker(self.key, board.get_piece(moves[i][0], moves[i][1])) {
+                legal_moves.push(moves[i]);
+            }
+        }
+        
+        return legal_moves;
     }
 }
 
