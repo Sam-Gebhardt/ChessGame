@@ -60,10 +60,10 @@ pub struct Knight {
     pub key: i8
 }
 
-// struct Bishop {
-//     pos: [i8; 2],
-//     key: i8
-// }
+pub struct Bishop {
+    pub pos: [i8; 2],
+    pub key: i8
+}
 
 // struct King {
 //     pos: [i8; 2],
@@ -153,20 +153,12 @@ impl Moves for Pawn {
             }
         }
         return all_moves;
-
-        // if two == 0 {
-        //     return false;
-        // }
-        // if one > 0 && two > 0 {
-        //     return true;
-        // } else if one < 0 && two < 0 {
-        //     return true;
-        // } return false;
     }
 }
 
 impl Moves for Tower {
     // Can move NSEW, till it reaches a piece or border
+    // Todo: Castling
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
         let mut moves: Vec<[i8; 2]> = Vec::new();
@@ -265,14 +257,76 @@ impl Moves for Knight {
     }
 }
 
-// impl Moves for Bishop {
-//     fn open_moves(&mut self, board: Board) {
-//         if self.key == -1 {
-//             println!("Yes");
-//         }
+impl Moves for Bishop {
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]>{
+        // Can move in the diagonal until it reaches a piece or border
 
-//     }
-// }
+        let mut moves: Vec<[i8; 2]> = Vec::new();
+        // Using 4 vectors and appending makes the output in order instead of mangled
+        let mut moves_0: Vec<[i8; 2]> = Vec::new();
+        let mut moves_1: Vec<[i8; 2]> = Vec::new();
+        let mut moves_2: Vec<[i8; 2]> = Vec::new();
+        let mut moves_3: Vec<[i8; 2]> = Vec::new();
+        // TODO: Condense into a single vec once debugging is done
+
+        // flag is set to false if piece is encoutered
+        let mut flags: [bool; 4] = [true; 4];
+        let x = self.pos[1];
+        let y = self.pos[0];
+
+        // Check if possible move is inbounds and if move is not behind another piece
+        // Then check if a piece occupys that space. If one is there set flag to false
+        // and check if piece is enemy or friedly, otherwise space is open
+        // Do check for each direction
+        for i in 1..9 { 
+            if (x + i < 8) && (y + i < 8) && flags[0] {
+
+                if board.get_piece(y + i, x + i) != 0  {
+                    flags[0] = false;
+                    if !sign_checker(self.key, board.get_piece(y + i, x + i)) {
+                        moves_0.push([y + i, x + i]);
+                    }
+                } else {
+                    moves_0.push([y + i, x + i]);
+                }
+            } if (x + i < 8) && (y - i > -1) && flags[1] {
+                if board.get_piece(y - i, x + i) != 0 {
+                    flags[1] = false;
+                    if !sign_checker(self.key, board.get_piece(y - i, x + i)) {
+                        moves_1.push([y - i, x + i]);
+                    }
+                } else {
+                    moves_1.push([y - i, x + i]);
+                }
+            } if (x - i > -1) && (y + i < 8) && flags[2] {
+                if board.get_piece(y + i, x - i) != 0 {
+                    flags[2] = false;
+                    if !sign_checker(self.key, board.get_piece(y + i, x - i)) {
+                        moves_2.push([y + i, x - i]);
+                    }
+                } else {
+                    moves_2.push([y + i, x - i]);
+                }
+            } if(x - i > -1) && (y - i > -1) && flags[3] {
+                if board.get_piece(y - i, x - i) != 0 {
+                    flags[3] = false;
+                    if !sign_checker(self.key, board.get_piece(y - i, x - i)) {
+                        moves_3.push([y - i, x - i]);
+                    }
+                } else {
+                    moves_3.push([y - i, x - i]);
+                }
+            }
+        }
+        
+        moves.append(&mut moves_0);
+        moves.append(&mut moves_1);
+        moves.append(&mut moves_2);
+        moves.append(&mut moves_3);
+
+        return moves;
+    }
+}
 
 // impl Moves for King {
 //     fn open_moves(&mut self, board: Board) {
@@ -283,6 +337,7 @@ impl Moves for Knight {
 // }
 
 // impl Moves for Queen {
+    // Call tower + bishop = done
 //     fn open_moves(&mut self, board: Board) {
 //         if self.key == -1 {
 //             println!("Yes");
@@ -290,13 +345,3 @@ impl Moves for Knight {
 
 //     }
 // }
-
-
-/* 
-Cardinal Directions for movement
-
-
-Each piece has a move_set and a key. The moveset is a Vector of strigs that holds the
-instructions for moving each piece. For example, Pawn is ["f"]
-It also holds a unique key that is representative of each piece of the board.
-*/
