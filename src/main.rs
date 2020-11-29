@@ -1,8 +1,9 @@
-use std::io;
-use std::io::Write;
+// use std::io;
+// use std::io::Write;
 mod pieces;
 mod tests;
-use crate::pieces::Moves;
+use std::rc::Rc;
+// use crate::pieces::Moves;
 
 /*
 Board construction:
@@ -33,9 +34,10 @@ Each piece is a heap allocated trait
 
 fn main() {
 
-    // Create a board         
+    // Create a board     
+    let m  = Rc::new(pieces::Pawn{pos:[0, 0], key: 1});    
     let mut board = pieces::Board{
-        b: [[Box::new(pieces::Empty{key: 0}); 8]; 8]
+        b: [[m; 8]; 8]
     }; 
 
     // Construct the board

@@ -1,26 +1,41 @@
 /*
 This file holds the classes of each piece and their respective moves
 */
+use std::rc::Rc;
 
+
+fn piece_generator(key: i8, pos: [i8; 2]) -> Rc<dyn Moves>{
+    let abs_key = key.abs();
+    let t: Rc<dyn Moves> = match abs_key {
+        1 => Rc::new(Pawn{pos: pos, key: key}),
+        2 => Rc::new(Tower{pos: pos, key: key}),
+        3 => Rc::new(Knight{pos: pos, key: key}),
+        4 => Rc::new(Bishop{pos: pos, key: key}),
+        5 => Rc::new(King{pos: pos, key: key}),
+        6 => Rc::new(Queen{pos: pos, key: key}),
+        _ => Rc::new(Pawn{pos: pos, key: key}),
+    };
+    return t;
+}
 
 pub struct Board {
-    pub b: [[Box<dyn Moves>; 8]; 8]
+    pub b: [[Rc<dyn Moves>; 8]; 8]
 }
 
 impl Board {
     pub fn construct(&mut self) { //Fill the board with pieces
         // put the pawns on the board
         for i in 0..8 {
-            self.b[1][i] = Box::new(Pawn{pos: [1, i as i8], key: 1});
-            self.b[6][i] = Box::new(Pawn{pos: [6, i as i8], key: -1});
+            self.b[1][i] = Rc::new(Pawn{pos: [1, i as i8], key: 1});
+            self.b[6][i] = Rc::new(Pawn{pos: [6, i as i8], key: -1});
         }
 
         // put non pawns on the board
         let mut start = 2;
         let mut change = 1;
         for i in 0..8 {
-            self.b[0][i] = start;
-            self.b[7][i] = start * -1;
+            self.b[0][i] = piece_generator(start, [0, i as i8]);
+            self.b[7][i] = piece_generator(start * -1, [0, i as i8]);
             start += change;
             if start == 7 {
                 start -= 3;
@@ -28,39 +43,50 @@ impl Board {
             }
         }
         // King and queen should be on opposite sides
-        // self.b[7][3] = -6;
-        // self.b[7][4] = -5;
+        self.b[7][3] = Rc::new(King{pos: [7, 3], key: -6});
+        self.b[7][4] = Rc::new(Queen{pos: [7, 4], key: -5});
     }
 
-    pub fn get_piece(&self, one: i8, two: i8) -> i8 {
+    // pub fn get_piece(&self, one: Rc<dyn Moves>, two: Rc<dyn Moves>) -> i8 {
+    //     // Get a piece from the board at b[one][two]
+
+    //     // Cast to correct type for indexing
+    //     let one_usize: usize = one as usize;
+    //     let two_usize: usize = two as usize;
+
+    //     return self.b[one_usize][two_usize].key;
+    // }
+
+    pub fn get_piece_int(&self, one: i8, two: i8) -> i8 {
         // Get a piece from the board at b[one][two]
 
         // Cast to correct type for indexing
         let one_usize: usize = one as usize;
         let two_usize: usize = two as usize;
 
-        return self.b[one_usize][two_usize];
+        return self.b[one_usize][two_usize].get_key();
     }
 
-    pub fn move_piece(&mut self, src: [i8; 2], dest: [i8; 2]) {
-        // Move a piece from src to dest, set src to 0
+    // pub fn move_piece(&mut self, src: [i8; 2], dest: [i8; 2]) {
+    //     // Move a piece from src to dest, set src to 0
 
-        self.b[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
-        self.b[src[0] as usize][src[1] as usize] = 0;
-    }
+    //     self.b[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
+    //     self.b[src[0] as usize][src[1] as usize] = 0;
+    // }
 
-    fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
-        // See if a move cause a check to happen
+    // fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
+    //     // See if a move cause a check to happen
 
-        for i in 0..8 {
-            for j in 0..8 {
-                let piece = piece_type(self.get_piece(i, j), [i, j]);
+    //     for i in 0..8 {
+    //         for j in 0..8 {
+    //             let piece = piece_type(self.get_piece(i, j), [i, j]);
             
-            }
-        }
-        return true;
-    }
+    //         }
+    //     }
+    //     return true;
+    // }
 }
+#[derive(Copy, Clone)]
 pub struct Empty {
     pub key: i8
 }
@@ -114,13 +140,20 @@ pub trait Moves {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;
     }
-}
 
+    fn get_key(&self) -> i8 {
+        return 0;
+    }
+}
 
 impl Moves for Empty {
     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;
+    }
+
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -152,7 +185,7 @@ impl Moves for Pawn {
 
         // Does a piece occupy a position where the pawn would move?
         for i in 0..valid.len() {
-            if board.get_piece(valid[i][0], valid[i][1]) == 0 {
+            if board.get_piece_int(valid[i][0], valid[i][1]) == 0 {
                 all_moves.push(valid[i]);
             }
         }
@@ -168,7 +201,7 @@ impl Moves for Pawn {
 
         // Now that we have the valid moves, check if they are legal
         for i in 0..valid.len() {
-            let diagonal: i8 = board.get_piece(valid[i][0], valid[i][1]);
+            let diagonal: i8 = board.get_piece_int(valid[i][0], valid[i][1]);
 
             // Can't use signal_checker fn because 0 is a special case for Pawns
             if !((self.key > 0 && diagonal >= 0) || (self.key < 0 && diagonal <= 0)) {
@@ -176,6 +209,9 @@ impl Moves for Pawn {
             }
         }
         return all_moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -204,36 +240,36 @@ impl Moves for Tower {
         for i in 1..9 { 
             if x + i < 8 && flags[0] {
 
-                if board.get_piece(y, x + i) != 0  {
+                if board.get_piece_int(y, x + i) != 0  {
                     flags[0] = false;
-                    if !sign_checker(self.key, board.get_piece(y, x + i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y, x + i)) {
                         moves_0.push([y, x + i]);
                     }
                 } else {
                     moves_0.push([y, x + i]);
                 }
             } if x - i > -1 && flags[1] {
-                if board.get_piece(y, x - i) != 0 {
+                if board.get_piece_int(y, x - i) != 0 {
                     flags[1] = false;
-                    if !sign_checker(self.key, board.get_piece(y, x - i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y, x - i)) {
                         moves_1.push([y, x - i]);
                     }
                 } else {
                     moves_1.push([y, x - i]);
                 }
             } if y + i < 8 && flags[2] {
-                if board.get_piece(y + i, x) != 0 {
+                if board.get_piece_int(y + i, x) != 0 {
                     flags[2] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x)) {
+                    if !sign_checker(self.key, board.get_piece_int(y + i, x)) {
                         moves_2.push([y + i, x]);
                     }
                 } else {
                     moves_2.push([y + i, x]);
                 }
             } if y - i > -1 && flags[3] {
-                if board.get_piece(y - i, x) != 0 {
+                if board.get_piece_int(y - i, x) != 0 {
                     flags[3] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x)) {
+                    if !sign_checker(self.key, board.get_piece_int(y - i, x)) {
                         moves_3.push([y - i, x]);
                     }
                 } else {
@@ -248,6 +284,9 @@ impl Moves for Tower {
         moves.append(&mut moves_3);
 
         return moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -273,12 +312,15 @@ impl Moves for Knight {
         }
 
         for i in 0..moves.len() {
-            if !sign_checker(self.key, board.get_piece(moves[i][0], moves[i][1])) {
+            if !sign_checker(self.key, board.get_piece_int(moves[i][0], moves[i][1])) {
                 legal_moves.push(moves[i]);
             }
         }
         
         return legal_moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -306,36 +348,36 @@ impl Moves for Bishop {
         for i in 1..9 { 
             if (x + i < 8) && (y + i < 8) && flags[0] {
 
-                if board.get_piece(y + i, x + i) != 0  {
+                if board.get_piece_int(y + i, x + i) != 0  {
                     flags[0] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x + i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y + i, x + i)) {
                         moves_0.push([y + i, x + i]);
                     }
                 } else {
                     moves_0.push([y + i, x + i]);
                 }
             } if (x + i < 8) && (y - i > -1) && flags[1] {
-                if board.get_piece(y - i, x + i) != 0 {
+                if board.get_piece_int(y - i, x + i) != 0 {
                     flags[1] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x + i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y - i, x + i)) {
                         moves_1.push([y - i, x + i]);
                     }
                 } else {
                     moves_1.push([y - i, x + i]);
                 }
             } if (x - i > -1) && (y + i < 8) && flags[2] {
-                if board.get_piece(y + i, x - i) != 0 {
+                if board.get_piece_int(y + i, x - i) != 0 {
                     flags[2] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x - i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y + i, x - i)) {
                         moves_2.push([y + i, x - i]);
                     }
                 } else {
                     moves_2.push([y + i, x - i]);
                 }
             } if(x - i > -1) && (y - i > -1) && flags[3] {
-                if board.get_piece(y - i, x - i) != 0 {
+                if board.get_piece_int(y - i, x - i) != 0 {
                     flags[3] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x - i)) {
+                    if !sign_checker(self.key, board.get_piece_int(y - i, x - i)) {
                         moves_3.push([y - i, x - i]);
                     }
                 } else {
@@ -350,6 +392,9 @@ impl Moves for Bishop {
         moves.append(&mut moves_3);
 
         return moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -368,11 +413,14 @@ impl Moves for King {
                 
                 continue;
             }
-            if !sign_checker(self.key, board.get_piece(y + changes[i][0], x + changes[i][1])) {
+            if !sign_checker(self.key, board.get_piece_int(y + changes[i][0], x + changes[i][1])) {
                 open_moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
         return open_moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -388,6 +436,9 @@ impl Moves for Queen {
         b_moves.append(&mut t_moves);
 
         return b_moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -410,4 +461,17 @@ Factor out bound checking and call in each piece
 
 **Change array of ints to array of boxes**
 
+*/
+
+
+/*
+
+fn main() {
+    // println!("Hello, world!");
+    struct Test {
+        key: i64,
+    };
+    let n: Rc<Test> = Rc::new(Test{key: 112121});
+    println!("{}", n.key);
+}
 */
