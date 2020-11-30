@@ -88,5 +88,21 @@ mod tests {
         board.b[5][6] = 1;
         assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 5], [5, 6], [5, 2], [5, 1], [4, 3]));
     }
+    #[test]
+    fn knight_moves {
+
+    }
+    #[test]
+    fn bishop_moves {
+
+    }
+    #[test]
+    fn queen_moves {
+
+    }
+    #[test]
+    fn king_moves {
+        
+    }
 }
 
