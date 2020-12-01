@@ -89,19 +89,28 @@ mod tests {
         assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 5], [5, 6], [5, 2], [5, 1], [4, 3]));
     }
     #[test]
-    fn knight_moves {
+    fn knight_moves() {
+        let mut board = Board{
+            b: [[0; 8]; 8]
+        }; 
+        board.construct();
+
+        let knight: Knight = Knight{pos: [0, 2], key: 3};
+        let knight_1: Knight = Knight{pos: [7, 7], key: -3};
+
+        assert_eq!(knight.move_set(&board), vec!([2, 3], [2, 1]));
 
     }
     #[test]
-    fn bishop_moves {
+    fn bishop_moves() {
 
     }
     #[test]
-    fn queen_moves {
+    fn queen_moves() {
 
     }
     #[test]
-    fn king_moves {
+    fn king_moves() {
         
     }
 }
