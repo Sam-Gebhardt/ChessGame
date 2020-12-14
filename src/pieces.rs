@@ -2,8 +2,10 @@
 This file holds the classes of each piece and their respective moves
 */
 
-fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
+pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
     let abs_key = key.abs();
+
+    // Boxing makes all struct have same size
     let t: Box<dyn Moves> = match abs_key {
         1 => Box::new(Pawn{pos: pos, key: key}),
         2 => Box::new(Tower{pos: pos, key: key}),
@@ -22,7 +24,9 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn construct(&mut self) { //Fill the board with pieces
+    //Fill the board with pieces
+    pub fn construct(&mut self) { 
+
         // put the pawns on the board
         for i in 0..8 {
             self.b[1][i] = 1;
@@ -69,7 +73,6 @@ impl Board {
         for i in 0..8 {
             for j in 0..8 {
                 let piece = piece_type(self.get_piece(i, j), [i, j]);
-            
             }
         }
         return true;
@@ -126,6 +129,10 @@ pub trait Moves {
         let val: Vec<[i8; 2]> = Vec::new();
         return val;
     }
+
+    fn get_key(&self) -> i8 {
+        return 0;
+    }
 }
 
 
@@ -180,6 +187,9 @@ impl Moves for Pawn {
             }
         }
         return all_moves;
+    }
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -253,6 +263,10 @@ impl Moves for Tower {
 
         return moves;
     }
+
+    fn get_key(&self) -> i8 {
+        return self.key;
+    }
 }
 
 impl Moves for Knight {
@@ -283,6 +297,10 @@ impl Moves for Knight {
         }
         
         return legal_moves;
+    }
+    
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
@@ -355,6 +373,10 @@ impl Moves for Bishop {
 
         return moves;
     }
+
+    fn get_key(&self) -> i8 {
+        return self.key;
+    }
 }
 
 impl Moves for King {
@@ -378,6 +400,10 @@ impl Moves for King {
         }
         return open_moves;
     }
+
+    fn get_key(&self) -> i8 {
+        return self.key;
+    }
 }
 
 impl Moves for Queen {
@@ -392,6 +418,10 @@ impl Moves for Queen {
         b_moves.append(&mut t_moves);
 
         return b_moves;
+    }
+
+    fn get_key(&self) -> i8 {
+        return self.key;
     }
 }
 
