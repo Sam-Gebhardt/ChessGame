@@ -95,10 +95,24 @@ mod tests {
         }; 
         board.construct();
 
+        // test default pos
         let knight: Knight = Knight{pos: [0, 2], key: 3};
-        let knight_1: Knight = Knight{pos: [7, 7], key: -3};
+        let knight_1: Knight = Knight{pos: [7, 6], key: -3};
 
         assert_eq!(knight.move_set(&board), vec!([2, 3], [2, 1]));
+        assert_eq!(knight_1.move_set(&board), vec!([5, 7], [5, 5]));
+
+        // test moves with friendly pieces in move pos
+        let knight_2: Knight = Knight{pos: [4, 4], key: 3};
+        let knight_3: Knight = Knight{pos: [4, 4], key: -3};
+
+        board.b[6][5] = 1;
+        board.b[6][3] = 1;
+        board.b[2][5] = 1;
+        board.b[2][3] = 1;
+
+        assert_eq!(knight_2.move_set(&board), vec!([5, 6], [3, 6], [5, 2], [3, 2]));
+        assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], [5, 6], [3, 6], [5, 2], [3, 2]))
 
     }
     #[test]
