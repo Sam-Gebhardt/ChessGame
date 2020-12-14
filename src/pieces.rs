@@ -133,6 +133,10 @@ pub trait Moves {
     fn get_key(&self) -> i8 {
         return 0;
     }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return [0, 0];
+    }
 }
 
 
@@ -188,8 +192,13 @@ impl Moves for Pawn {
         }
         return all_moves;
     }
+
     fn get_key(&self) -> i8 {
         return self.key;
+    }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
     }
 }
 
@@ -267,6 +276,10 @@ impl Moves for Tower {
     fn get_key(&self) -> i8 {
         return self.key;
     }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
+    }
 }
 
 impl Moves for Knight {
@@ -298,9 +311,13 @@ impl Moves for Knight {
         
         return legal_moves;
     }
-    
+
     fn get_key(&self) -> i8 {
         return self.key;
+    }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
     }
 }
 
@@ -377,6 +394,10 @@ impl Moves for Bishop {
     fn get_key(&self) -> i8 {
         return self.key;
     }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
+    }
 }
 
 impl Moves for King {
@@ -404,6 +425,10 @@ impl Moves for King {
     fn get_key(&self) -> i8 {
         return self.key;
     }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
+    }
 }
 
 impl Moves for Queen {
@@ -422,6 +447,10 @@ impl Moves for Queen {
 
     fn get_key(&self) -> i8 {
         return self.key;
+    }
+
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
     }
 }
 
