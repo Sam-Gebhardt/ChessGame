@@ -1,8 +1,8 @@
-use std::io;
-use std::io::Write;
 mod pieces;
 mod tests;
-use crate::pieces::Moves;
+mod board;
+// use crate::pieces::Moves;
+// use crate::board;
 
 /*
 Board construction:
@@ -34,36 +34,33 @@ Each piece is a heap allocated trait
 fn main() {
 
     // Create a board         
-    let mut board = pieces::Board{
+    let mut board = board::Board{
         b: [[0; 8]; 8]
     }; 
 
     // Construct the board
     board.construct();
 
-    // print the board
-    for i in 0..8 {
-        for j in 0..8 {
-            if board.b[i][j] >= 0 {
-                print!("  {}", board.b[i][j]);
+    // print the starting board
+    board.print_b();
 
-            } else {
-                print!(" {}", board.b[i][j]);
-            }
-        }
-        io::stdout().flush().unwrap();
-        println!("");
+    loop {
+        board.user_move();
+        board.print_b();
     }
 
-    let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
-    let out: Vec<[i8; 2]> = king.move_set(&board);
-    for i in 0..out.len() {
-        println!("{:?}", out[i]);
-    }
-    println!("");
+    // let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
+    // let out: Vec<[i8; 2]> = king.move_set(&board);
+    // for i in 0..out.len() {
+    //     println!("{:?}", out[i]);
+    // }
+    // println!("");
 
     // let valid: Vec<[i8; 2]> = board.bound_check(out);
     // for i in 0..valid.len() {
     //     println!("{:?}", valid[i]);
     // }
+
+    // let w: Box<dyn Moves> = pieces::piece_type(6, [0, 10]);
+    // println!("{:?}", w.get_pos());
 }

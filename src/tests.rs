@@ -1,7 +1,7 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::pieces::Board;
+    use crate::board::Board;
     use crate::pieces::*;
     // use std::io;
     // use std::io::Write;
