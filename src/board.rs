@@ -46,7 +46,9 @@ fn convert_user_input(input: String) -> [i8; 2] {
 }
 
 pub struct Board {
-    pub b: [[i8; 8]; 8]
+    pub b: [[i8; 8]; 8],
+    white: [i8; 2],
+    black: [i8; 2]
 }
 
 impl Board {
@@ -165,7 +167,13 @@ impl Board {
         }
 
         return true;
+    }
 
+    pub fn set_king(&mut self, key: i8, pos: [i8; 2]) {
+        if key > 0 {
+            self.white = pos;
+        }
+        self.black = pos;
     }
 
     pub fn get_piece(&self, one: i8, two: i8) -> i8 {
@@ -176,19 +184,43 @@ impl Board {
 
     pub fn move_piece(&mut self, src: [i8; 2], dest: [i8; 2]) {
         // Move a piece from src to dest, set src to 0
+        let key: i8 = self.get_piece(src[0], src[1]);
 
-        self.b[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
+        if key == 6 || key == -6 {
+            self.set_king(key, dest);
+        }
+
+        self.b[dest[0] as usize][dest[1] as usize] = key;
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    // fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
-    //     // See if a move cause a check to happen
+    fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
+        // See if a move cause a check to happen
 
-    //     for i in 0..8 {
-    //         for j in 0..8 {
-    //             let piece = piece_type(self.get_piece(i, j), [i, j]);
-    //         }
-    //     }
-    //     return true;
-    // }
+        let mut copy: [[i8; 8]; 8] = self.b;
+
+        copy[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
+        copy[src[0] as usize][src[1] as usize] = 0;
+
+        for i in 0..8 {
+            for j in 0..8 {
+                let piece = piece_type(copy[i as usize][j as usize], [i, j]);
+            }
+        }
+        return true;
+    }
 }
+
+// Idea for testing check:
+/*
+Board maintains pos of white/black king 
+Loop through each piece and check if kings are in an avabilbe move
+Should each piece maintain a vec of open moves?
+    -Makes sense if a graphics point of view 
+    -Maybe implement with graphics
+
+CheckMate:
+
+
+
+*/
