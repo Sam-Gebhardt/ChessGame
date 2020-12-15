@@ -8,6 +8,7 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
 
     // Boxing makes all struct have same size
     let t: Box<dyn Moves> = match abs_key {
+        0 => Box::new(Empty{pos: pos, key: key}),
         1 => Box::new(Pawn{pos: pos, key: key}),
         2 => Box::new(Tower{pos: pos, key: key}),
         3 => Box::new(Knight{pos: pos, key: key}),
@@ -17,6 +18,10 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
         _ => Box::new(Pawn{pos: pos, key: key}),
     };
     return t;
+}
+pub struct Empty {
+    pub pos: [i8; 2],
+    pub key: i8
 }
 
 pub struct Pawn {
@@ -77,7 +82,18 @@ pub trait Moves {
         return [0, 0];
     }
 }
+impl Moves for Empty {
+    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> { 
+        let e: Vec<[i8; 2]> = Vec::new();
+        return e;
+    }
+    fn get_key(&self) -> i8 {
+        return 0;
+    }
 
+    fn get_pos(&self) -> [i8; 2] {
+        return self.pos;
+    }
 
 impl Moves for Pawn {
     // has 4 possible moves:
@@ -320,6 +336,7 @@ impl Moves for Bishop {
                     moves_3.push([y - i, x - i]);
                 }
             }
+            //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
         
         moves.append(&mut moves_0);
@@ -396,7 +413,6 @@ impl Moves for Queen {
 /*
 TODO:
 i8 -> i4
-implement get methods
 make struct attributes private
 Condense vectors in Tower/Bishop
 Castling
