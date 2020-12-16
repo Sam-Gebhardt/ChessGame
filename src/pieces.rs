@@ -62,12 +62,15 @@ fn sign_checker(one: i8, two: i8) -> bool {
     }
     if one > 0 && two > 0 {
         return true;
+
     } else if one < 0 && two < 0 {
         return true;
+
     } return false;
 }
 
 pub trait Moves {
+    
     // Empty methods to overwrite by each piece
     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
@@ -97,16 +100,11 @@ pub trait Moves {
 // }
 
 impl Moves for Pawn {
-    // has 4 possible moves:
-    // +2 (Special case), +1, +1-1, +1+1
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
-        let mut direction = 1; 
 
-        if self.key == -1 {
-            direction = -1;
-        }
-        // A vector that holds all possible moves for a Pawn at pos [x][y]
+        let mut direction = self.key; 
+
         let mut all_moves: Vec<[i8; 2]> = Vec::new();
         let mut valid: Vec<[i8; 2]> = Vec::new();
 
@@ -115,11 +113,8 @@ impl Moves for Pawn {
             valid.push([self.pos[0] + direction * 2, self.pos[1]]);
         }
 
-        // Edge case: Pawn reaches end of board causes array issue
-        // shoudn't be an issue once upgrading pawns is implimented
-
         // Move forward 1 
-        valid.push([self.pos[0] + 1 * direction, self.pos[1]]);
+        valid.push([self.pos[0] + direction, self.pos[1]]);
 
         // Does a piece occupy a position where the pawn would move?
         for i in 0..valid.len() {
@@ -131,10 +126,10 @@ impl Moves for Pawn {
 
         // Check if an oppenent is in the diagonal
         if (self.pos[1] + 1) != 8 {
-            valid.push([self.pos[0] + (1 * direction), self.pos[1] + 1]);
+            valid.push([self.pos[0] + direction, self.pos[1] + 1]);
         }
         if (self.pos[1] - 1) != -1 {
-            valid.push([self.pos[0] + (1 * direction), self.pos[1] - 1]);
+            valid.push([self.pos[0] + direction, self.pos[1] - 1]);
         }
 
         // Now that we have the valid moves, check if they are legal
@@ -241,8 +236,8 @@ impl Moves for Knight {
 
         for i in 0..8 {
             // Bound check
-            if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 
-                || x + changes[i][1] > 7 || x + changes[i][1] < 0) {
+            if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
+                 x + changes[i][1] > 7 || x + changes[i][1] < 0) {
 
                 moves.push([y + changes[i][0], x + changes[i][1]])
             }
@@ -322,7 +317,6 @@ impl Moves for Bishop {
             }
             //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
-
         return moves;
     }
 
@@ -337,19 +331,22 @@ impl Moves for Bishop {
 
 impl Moves for King {
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+
+        // All 8 possible moves for a King
         let changes: [[i8; 2]; 8] = [[1, 0], [1, -1], [0, -1], [-1, -1], 
-                                   [-1, 0], [-1, 1], [0, 1], [1, 1]];
+                                     [-1, 0], [-1, 1], [0, 1], [1, 1]];
         
         let mut open_moves: Vec<[i8; 2]> = Vec::new();
         let x = self.pos[1];
         let y = self.pos[0];
 
         for i in 0..8 {
-            if y + changes[i][0] > 7 || y + changes[i][0] < 0 
-                || x + changes[i][1] > 7 || x + changes[i][1] < 0 {
+            if y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
+               x + changes[i][1] > 7 || x + changes[i][1] < 0 {
                 
                 continue;
             }
+
             if !sign_checker(self.key, board.get_piece(y + changes[i][0], x + changes[i][1])) {
                 open_moves.push([y + changes[i][0], x + changes[i][1]])
             }
@@ -369,6 +366,7 @@ impl Moves for King {
 impl Moves for Queen {
     // Call tower + bishop 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+
         let t: Tower = Tower{pos: self.pos, key: self.key};
         let b: Bishop = Bishop{pos: self.pos, key: self.key};
 
@@ -376,7 +374,6 @@ impl Moves for Queen {
         let mut t_moves: Vec<[i8; 2]> = t.move_set(board);
 
         b_moves.append(&mut t_moves);
-
         return b_moves;
     }
 
@@ -397,4 +394,7 @@ Castling
 Factor out bound checking and call in each piece
 Fix tests.rs to use methods instead of direct access
 Switch to bimap
+Upgrade pawns
+Add bound checking function
+Fix bishop/tower mess
 */
