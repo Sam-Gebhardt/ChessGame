@@ -4,6 +4,7 @@ use char;
 use crate::pieces::piece_type;
 use crate::pieces::Moves;
 
+
 fn alpha(n: i8) -> &'static str {
     // Converts index to alpha char
     let a: &'static str = match n {
@@ -47,8 +48,8 @@ fn convert_user_input(input: String) -> [i8; 2] {
 
 pub struct Board {
     pub b: [[i8; 8]; 8],
-    white: [i8; 2],
-    black: [i8; 2]
+    pub white: [i8; 2],
+    pub black: [i8; 2]
 }
 
 impl Board {
@@ -76,6 +77,9 @@ impl Board {
         // King and queen should be on opposite sides
         self.b[7][3] = -6;
         self.b[7][4] = -5;
+
+        self.white = [0, 3];
+        self.black = [7, 4];
     }
 
     pub fn print_b(&self) {
@@ -117,8 +121,9 @@ impl Board {
     }
 
     pub fn user_move(&mut self) {
-        self.get_input();
+        // Allows user to move pieces
 
+        self.get_input();
     }
 
     fn get_input(&mut self) {
@@ -148,7 +153,7 @@ impl Board {
         }
     }
 
-    fn legal_move(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
+    fn legal_move(&mut self, src: [i8; 2], dest: [i8; 2]) -> bool {
         // is the inputed move legal
 
         if src[0] > 7 || src[0] < 0 || src[1] > 7 || src[1] < 0 {
@@ -164,6 +169,11 @@ impl Board {
         let move_set: Vec<[i8; 2]> = p.move_set(&self);
         if !(move_set.contains(&dest)) {
             return false
+        }
+
+        if self.in_check(src, dest) != 0 {
+            println!("Move puts you in check.");
+            return false;
         }
 
         return true;
@@ -186,7 +196,7 @@ impl Board {
         // Move a piece from src to dest, set src to 0
         let key: i8 = self.get_piece(src[0], src[1]);
 
-        if key == 6 || key == -6 {
+        if key == 5 || key == -5 {
             self.set_king(key, dest);
         }
 
@@ -194,20 +204,65 @@ impl Board {
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    fn in_check(&self, src: [i8; 2], dest: [i8; 2]) -> bool {
+    fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
         // See if a move cause a check to happen
 
-        let mut copy: [[i8; 8]; 8] = self.b;
-
-        copy[dest[0] as usize][dest[1] as usize] = self.get_piece(src[0], src[1]);
-        copy[src[0] as usize][src[1] as usize] = 0;
+        self.move_piece(src, dest);
 
         for i in 0..8 {
             for j in 0..8 {
-                let piece = piece_type(copy[i as usize][j as usize], [i, j]);
+                let piece: Box<dyn Moves> = piece_type(self.get_piece(i, j), [i, j]);
+
+                if piece.get_key() > 0 {
+                    if piece.move_set(&self).contains(&self.black) {
+                        self.move_piece(dest, src);
+                        return -6; //black is in check
+                    }
+                } else {
+                    if piece.move_set(&self).contains(&self.white) {
+                        self.move_piece(dest, src);
+                        return 6; // white is in check
+                    }
+                }
             }
         }
-        return true;
+        self.move_piece(dest, src);
+        return 0; //not in check
+    }
+
+    pub fn check_mate(&mut self) -> bool {
+        // King is currently in check and can't move
+
+        let check: i8 = self.in_check([0, 0], [0, 0]);
+        let pos: [i8; 2];
+        let piece: Box<dyn Moves>;
+        let color: i8;
+
+        if check == -6 { 
+            pos = self.black;
+            piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
+            color = -6;
+
+        } else if check == 6 {
+            pos = self.white;
+            piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
+            color = 6;
+
+        } else {
+            return false
+        }
+
+        let moves: Vec<[i8; 2]> = piece.move_set(&self);
+        if moves.len() == 0 {
+            return true;
+        }
+
+        for i in 0..moves.len() {
+            if self.in_check(pos, moves[i]) == color {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -224,3 +279,4 @@ CheckMate:
 
 
 */
+
