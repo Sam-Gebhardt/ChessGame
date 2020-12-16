@@ -8,7 +8,7 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
 
     // Boxing makes all struct have same size
     let t: Box<dyn Moves> = match abs_key {
-        0 => Box::new(Empty{pos: pos, key: key}),
+        // 0 => Box::new(Empty{pos: pos, key: key}),
         1 => Box::new(Pawn{pos: pos, key: key}),
         2 => Box::new(Tower{pos: pos, key: key}),
         3 => Box::new(Knight{pos: pos, key: key}),
@@ -19,39 +19,39 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
     };
     return t;
 }
-pub struct Empty {
-    pub pos: [i8; 2],
-    pub key: i8
+// pub struct Empty {
+//     pub pos: [i8; 2],
+//     pub key: i8
+// }
+
+struct Pawn {
+    pos: [i8; 2],
+    key: i8
 }
 
-pub struct Pawn {
-    pub pos: [i8; 2],
-    pub key: i8
+struct Tower {
+    pos: [i8; 2],
+    key: i8
 }
 
-pub struct Tower {
-    pub pos: [i8; 2],
-    pub key: i8
+struct Knight {
+    pos: [i8; 2],
+    key: i8
 }
 
-pub struct Knight {
-    pub pos: [i8; 2],
-    pub key: i8
+struct Bishop {
+    pos: [i8; 2],
+    key: i8
 }
 
-pub struct Bishop {
-    pub pos: [i8; 2],
-    pub key: i8
+struct King {
+    pos: [i8; 2],
+    key: i8
 }
 
-pub struct King {
-    pub pos: [i8; 2],
-    pub key: i8
-}
-
-pub struct Queen {
-    pub pos: [i8; 2],
-    pub key: i8
+struct Queen {
+    pos: [i8; 2],
+    key: i8
 }
 
 fn sign_checker(one: i8, two: i8) -> bool {
@@ -82,18 +82,19 @@ pub trait Moves {
         return [0, 0];
     }
 }
-impl Moves for Empty {
-    fn move_set(&self, board: &Board) -> Vec<[i8; 2]> { 
-        let e: Vec<[i8; 2]> = Vec::new();
-        return e;
-    }
-    fn get_key(&self) -> i8 {
-        return 0;
-    }
+// impl Moves for Empty {
+//     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> { 
+//         let e: Vec<[i8; 2]> = Vec::new();
+//         return e;
+//     }
+//     fn get_key(&self) -> i8 {
+//         return 0;
+//     }
 
-    fn get_pos(&self) -> [i8; 2] {
-        return self.pos;
-    }
+//     fn get_pos(&self) -> [i8; 2] {
+//         return self.pos;
+//     }
+// }
 
 impl Moves for Pawn {
     // has 4 possible moves:
@@ -416,10 +417,10 @@ i8 -> i4
 make struct attributes private
 Condense vectors in Tower/Bishop
 Castling
-Empty
-Switch to refrences
-Maintain open moves
 Factor out bound checking and call in each piece
+Set structs to have private fields, Fix tests.rs to use methods
+    instead of direct access
+Switch to bimap
 */
 
 
