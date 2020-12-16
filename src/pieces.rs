@@ -164,12 +164,6 @@ impl Moves for Tower {
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
         let mut moves: Vec<[i8; 2]> = Vec::new();
-        // Using 4 vectors and appending makes the output in order instead of mangled
-        let mut moves_0: Vec<[i8; 2]> = Vec::new();
-        let mut moves_1: Vec<[i8; 2]> = Vec::new();
-        let mut moves_2: Vec<[i8; 2]> = Vec::new();
-        let mut moves_3: Vec<[i8; 2]> = Vec::new();
-        // TODO: Condense into a single vec once debugging is done
 
         // flag is set to false if piece is encoutered
         let mut flags: [bool; 4] = [true; 4];
@@ -186,45 +180,40 @@ impl Moves for Tower {
                 if board.get_piece(y, x + i) != 0  {
                     flags[0] = false;
                     if !sign_checker(self.key, board.get_piece(y, x + i)) {
-                        moves_0.push([y, x + i]);
+                        moves.push([y, x + i]);
                     }
                 } else {
-                    moves_0.push([y, x + i]);
+                    moves.push([y, x + i]);
                 }
             } if x - i > -1 && flags[1] {
                 if board.get_piece(y, x - i) != 0 {
                     flags[1] = false;
                     if !sign_checker(self.key, board.get_piece(y, x - i)) {
-                        moves_1.push([y, x - i]);
+                        moves.push([y, x - i]);
                     }
                 } else {
-                    moves_1.push([y, x - i]);
+                    moves.push([y, x - i]);
                 }
             } if y + i < 8 && flags[2] {
                 if board.get_piece(y + i, x) != 0 {
                     flags[2] = false;
                     if !sign_checker(self.key, board.get_piece(y + i, x)) {
-                        moves_2.push([y + i, x]);
+                        moves.push([y + i, x]);
                     }
                 } else {
-                    moves_2.push([y + i, x]);
+                    moves.push([y + i, x]);
                 }
             } if y - i > -1 && flags[3] {
                 if board.get_piece(y - i, x) != 0 {
                     flags[3] = false;
                     if !sign_checker(self.key, board.get_piece(y - i, x)) {
-                        moves_3.push([y - i, x]);
+                        moves.push([y - i, x]);
                     }
                 } else {
-                    moves_3.push([y - i, x]);
+                    moves.push([y - i, x]);
                 }
             }
         }
-        
-        moves.append(&mut moves_0);
-        moves.append(&mut moves_1);
-        moves.append(&mut moves_2);
-        moves.append(&mut moves_3);
 
         return moves;
     }
@@ -282,13 +271,7 @@ impl Moves for Bishop {
         // Can move in the diagonal until it reaches a piece or border
 
         let mut moves: Vec<[i8; 2]> = Vec::new();
-        // Using 4 vectors and appending makes the output in order instead of mangled
-        let mut moves_0: Vec<[i8; 2]> = Vec::new();
-        let mut moves_1: Vec<[i8; 2]> = Vec::new();
-        let mut moves_2: Vec<[i8; 2]> = Vec::new();
-        let mut moves_3: Vec<[i8; 2]> = Vec::new();
-        // TODO: Condense into a single vec once debugging is done
-
+        
         // flag is set to false if piece is encoutered
         let mut flags: [bool; 4] = [true; 4];
         let x = self.pos[1];
@@ -304,46 +287,41 @@ impl Moves for Bishop {
                 if board.get_piece(y + i, x + i) != 0  {
                     flags[0] = false;
                     if !sign_checker(self.key, board.get_piece(y + i, x + i)) {
-                        moves_0.push([y + i, x + i]);
+                        moves.push([y + i, x + i]);
                     }
                 } else {
-                    moves_0.push([y + i, x + i]);
+                    moves.push([y + i, x + i]);
                 }
             } if (x + i < 8) && (y - i > -1) && flags[1] {
                 if board.get_piece(y - i, x + i) != 0 {
                     flags[1] = false;
                     if !sign_checker(self.key, board.get_piece(y - i, x + i)) {
-                        moves_1.push([y - i, x + i]);
+                        moves.push([y - i, x + i]);
                     }
                 } else {
-                    moves_1.push([y - i, x + i]);
+                    moves.push([y - i, x + i]);
                 }
             } if (x - i > -1) && (y + i < 8) && flags[2] {
                 if board.get_piece(y + i, x - i) != 0 {
                     flags[2] = false;
                     if !sign_checker(self.key, board.get_piece(y + i, x - i)) {
-                        moves_2.push([y + i, x - i]);
+                        moves.push([y + i, x - i]);
                     }
                 } else {
-                    moves_2.push([y + i, x - i]);
+                    moves.push([y + i, x - i]);
                 }
             } if(x - i > -1) && (y - i > -1) && flags[3] {
                 if board.get_piece(y - i, x - i) != 0 {
                     flags[3] = false;
                     if !sign_checker(self.key, board.get_piece(y - i, x - i)) {
-                        moves_3.push([y - i, x - i]);
+                        moves.push([y - i, x - i]);
                     }
                 } else {
-                    moves_3.push([y - i, x - i]);
+                    moves.push([y - i, x - i]);
                 }
             }
             //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
-        
-        moves.append(&mut moves_0);
-        moves.append(&mut moves_1);
-        moves.append(&mut moves_2);
-        moves.append(&mut moves_3);
 
         return moves;
     }
@@ -414,13 +392,9 @@ impl Moves for Queen {
 /*
 TODO:
 i8 -> i4
-make struct attributes private
 Condense vectors in Tower/Bishop
 Castling
 Factor out bound checking and call in each piece
-Set structs to have private fields, Fix tests.rs to use methods
-    instead of direct access
+Fix tests.rs to use methods instead of direct access
 Switch to bimap
 */
-
-
