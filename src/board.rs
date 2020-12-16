@@ -120,13 +120,13 @@ impl Board {
         println!("");
     }
 
-    pub fn user_move(&mut self) {
+    pub fn user_move(&mut self) -> bool{
         // Allows user to move pieces
 
-        self.get_input();
+        return self.get_input();
     }
 
-    fn get_input(&mut self) {
+    fn get_input(&mut self) -> bool {
         let mut from: String =  String::new();
         let mut to: String = String::new();
 
@@ -142,6 +142,10 @@ impl Board {
         io::stdin().read_line(&mut to)
             .expect("Enter a pos");
         
+        if from == "q\n".to_string() {
+            return false;
+        }
+        
         let parsed_from: [i8; 2] = convert_user_input(from);
         let parsed_to: [i8; 2] = convert_user_input(to);
 
@@ -151,6 +155,7 @@ impl Board {
         } else {
             self.move_piece(parsed_from, parsed_to);
         }
+        return true;
     }
 
     fn legal_move(&mut self, src: [i8; 2], dest: [i8; 2]) -> bool {
@@ -263,6 +268,38 @@ impl Board {
             }
         }
         return false;
+    }
+
+    pub fn stalemate(&mut self) -> bool {
+        // no legal moves, but not in check
+
+        /* Move complex than this:
+        Could have stalemate with multible pieces
+        
+
+
+        */
+        // let mut white: Vec<[i8; 2]>;
+        // let mut black: Vec<[i8; 2]>;
+
+        // let white_king: Box<dyn Moves> = piece_type(self.get_piece(self.white[0], self.white[1]), self.white);
+        // let black_king: Box<dyn Moves> = piece_type(self.get_piece(self.black[0], self.black[1]), self.black);
+
+        // white = white_king.move_set(&self);
+        // black = black_king.move_set(&self);
+
+        // for i in 0..white.len() {
+        //     if self.in_check(self.white, white[i]) != 6 {
+        //         return false;
+        //     }
+        // }
+
+        // for i in 0..black.len() {
+        //     if self.in_check(self.black, black[i]) != -6 {
+        //         return false;
+        //     }
+        // }
+        // return true;
     }
 }
 
