@@ -69,8 +69,20 @@ fn sign_checker(one: i8, two: i8) -> bool {
     } return false;
 }
 
+fn tb_helper(key: i8, pos: [i8; 3], flags: &mut [bool; 4], moves: &mut Vec<[i8; 2]>, board: &Board) {
+
+    if board.get_piece(pos[1], pos[0]) != 0 {
+        flags[pos[2] as usize] = false;
+        if !sign_checker(key, board.get_piece(pos[1], pos[0])) {
+            moves.push([pos[1], pos[0]]);
+        }
+    } else {
+        moves.push([pos[1], pos[0]]);
+    }
+}
+
 pub trait Moves {
-    
+
     // Empty methods to overwrite by each piece
     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> {
         let val: Vec<[i8; 2]> = Vec::new();
@@ -103,7 +115,7 @@ impl Moves for Pawn {
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
 
-        let mut direction = self.key; 
+        let direction = self.key; 
 
         let mut all_moves: Vec<[i8; 2]> = Vec::new();
         let mut valid: Vec<[i8; 2]> = Vec::new();
@@ -172,41 +184,20 @@ impl Moves for Tower {
         for i in 1..9 { 
             if x + i < 8 && flags[0] {
 
-                if board.get_piece(y, x + i) != 0  {
-                    flags[0] = false;
-                    if !sign_checker(self.key, board.get_piece(y, x + i)) {
-                        moves.push([y, x + i]);
-                    }
-                } else {
-                    moves.push([y, x + i]);
-                }
+                tb_helper(self.key, [x + i, y, 0], &mut flags, &mut moves, board);
+
             } if x - i > -1 && flags[1] {
-                if board.get_piece(y, x - i) != 0 {
-                    flags[1] = false;
-                    if !sign_checker(self.key, board.get_piece(y, x - i)) {
-                        moves.push([y, x - i]);
-                    }
-                } else {
-                    moves.push([y, x - i]);
-                }
+
+                tb_helper(self.key, [x - i, y, 1], &mut flags, &mut moves, board);
+
             } if y + i < 8 && flags[2] {
-                if board.get_piece(y + i, x) != 0 {
-                    flags[2] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x)) {
-                        moves.push([y + i, x]);
-                    }
-                } else {
-                    moves.push([y + i, x]);
-                }
+
+                tb_helper(self.key, [x, y + i, 2], &mut flags, &mut moves, board);
+
             } if y - i > -1 && flags[3] {
-                if board.get_piece(y - i, x) != 0 {
-                    flags[3] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x)) {
-                        moves.push([y - i, x]);
-                    }
-                } else {
-                    moves.push([y - i, x]);
-                }
+                
+                tb_helper(self.key, [x, y - i, 3], &mut flags, &mut moves, board);
+
             }
         }
 
@@ -279,41 +270,20 @@ impl Moves for Bishop {
         for i in 1..9 { 
             if (x + i < 8) && (y + i < 8) && flags[0] {
 
-                if board.get_piece(y + i, x + i) != 0  {
-                    flags[0] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x + i)) {
-                        moves.push([y + i, x + i]);
-                    }
-                } else {
-                    moves.push([y + i, x + i]);
-                }
+                tb_helper(self.key, [x + i, y + i, 0], &mut flags, &mut moves, board);
+
             } if (x + i < 8) && (y - i > -1) && flags[1] {
-                if board.get_piece(y - i, x + i) != 0 {
-                    flags[1] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x + i)) {
-                        moves.push([y - i, x + i]);
-                    }
-                } else {
-                    moves.push([y - i, x + i]);
-                }
+                
+                tb_helper(self.key, [x + i, y - i, 1], &mut flags, &mut moves, board);
+
             } if (x - i > -1) && (y + i < 8) && flags[2] {
-                if board.get_piece(y + i, x - i) != 0 {
-                    flags[2] = false;
-                    if !sign_checker(self.key, board.get_piece(y + i, x - i)) {
-                        moves.push([y + i, x - i]);
-                    }
-                } else {
-                    moves.push([y + i, x - i]);
-                }
+
+                tb_helper(self.key, [x - i, y + i, 2], &mut flags, &mut moves, board);
+
             } if(x - i > -1) && (y - i > -1) && flags[3] {
-                if board.get_piece(y - i, x - i) != 0 {
-                    flags[3] = false;
-                    if !sign_checker(self.key, board.get_piece(y - i, x - i)) {
-                        moves.push([y - i, x - i]);
-                    }
-                } else {
-                    moves.push([y - i, x - i]);
-                }
+
+                tb_helper(self.key, [x - i, y - i, 3], &mut flags, &mut moves, board);
+
             }
             //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
@@ -393,8 +363,10 @@ Condense vectors in Tower/Bishop
 Castling
 Factor out bound checking and call in each piece
 Fix tests.rs to use methods instead of direct access
-Switch to bimap
 Upgrade pawns
 Add bound checking function
-Fix bishop/tower mess
 */
+
+// *************************************************************************************
+// Test cases for private functions/structs
+
