@@ -1,6 +1,7 @@
 mod pieces;
-mod tests;
 mod board;
+mod random;
+
 // use crate::pieces::Moves;
 // use crate::board;
 
@@ -35,7 +36,9 @@ fn main() {
 
     // Create a board         
     let mut board = board::Board{
-        b: [[0; 8]; 8]
+        b: [[0; 8]; 8],
+        white: [0, 0],
+        black: [0, 0]
     }; 
 
     // Construct the board
@@ -43,24 +46,26 @@ fn main() {
 
     // print the starting board
     board.print_b();
-
+    // for _i in 0..5 {
+    //     random::choose_move(&mut board);
+    // }
     loop {
-        board.user_move();
+        if !(board.user_move()) {
+            break;
+        }
+        if board.check_mate() {
+            println!("Game over!");
+            break;
+        }
+
+        // An opponent that chooses a random piece to move
+        random::random_move(&mut board);
+
+        if board.check_mate() {
+            println!("Game over!");
+            break;
+        }
+
         board.print_b();
     }
-
-    // let king: pieces::King = pieces::King{pos: [5, 1], key: 5};
-    // let out: Vec<[i8; 2]> = king.move_set(&board);
-    // for i in 0..out.len() {
-    //     println!("{:?}", out[i]);
-    // }
-    // println!("");
-
-    // let valid: Vec<[i8; 2]> = board.bound_check(out);
-    // for i in 0..valid.len() {
-    //     println!("{:?}", valid[i]);
-    // }
-
-    // let w: Box<dyn Moves> = pieces::piece_type(6, [0, 10]);
-    // println!("{:?}", w.get_pos());
 }
