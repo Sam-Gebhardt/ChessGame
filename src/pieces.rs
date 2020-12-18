@@ -97,15 +97,16 @@ impl Moves for Pawn {
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
 
-        let direction = self.key; 
+        let direction = self.key * -1; 
 
         let mut all_moves: Vec<[i8; 2]> = Vec::new();
         let mut valid: Vec<[i8; 2]> = Vec::new();
 
         // Check if Pawn can move 2 spaces
-        if (self.pos[0] == 6 && self.key == -1) || (self.pos[0] == 1 && self.key == 1) {
+        if (self.pos[0] == 6 && self.key == 1) || (self.pos[0] == 1 && self.key == -1) {
             valid.push([self.pos[0] + direction * 2, self.pos[1]]);
         }
+        println!("{:?}", valid);
 
         // Move forward 1 
         valid.push([self.pos[0] + direction, self.pos[1]]);
@@ -348,7 +349,7 @@ Add bound checking function
 Add check test within each piece move_set
     *Needs to happen because the opponent algos aren't going
     to do checking if a move is legal or not
-Fix stalemate: 
+Fix in_check: Both could be in check, pass key to funct
 */
 
 // *************************************************************************************
