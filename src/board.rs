@@ -213,7 +213,7 @@ impl Board {
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
+    pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
         // See if a move cause a check to happen
 
         self.move_piece(src, dest);
@@ -326,3 +326,7 @@ impl Board {
         return true;
     }
 }
+
+//*******************************************************************************************************
+// Test cases for private functions/methods/structs
+
