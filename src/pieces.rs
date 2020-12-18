@@ -8,7 +8,6 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
 
     // Boxing makes all struct have same size
     let t: Box<dyn Moves> = match abs_key {
-        // 0 => Box::new(Empty{pos: pos, key: key}),
         1 => Box::new(Pawn{pos: pos, key: key}),
         2 => Box::new(Tower{pos: pos, key: key}),
         3 => Box::new(Knight{pos: pos, key: key}),
@@ -19,10 +18,6 @@ pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
     };
     return t;
 }
-// pub struct Empty {
-//     pub pos: [i8; 2],
-//     pub key: i8
-// }
 
 struct Pawn {
     pos: [i8; 2],
@@ -54,7 +49,7 @@ struct Queen {
     key: i8
 }
 
-fn sign_checker(one: i8, two: i8) -> bool {
+pub fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
     // else return false
     if two == 0 {
@@ -97,19 +92,6 @@ pub trait Moves {
         return [0, 0];
     }
 }
-// impl Moves for Empty {
-//     fn move_set(&self, _board: &Board) -> Vec<[i8; 2]> { 
-//         let e: Vec<[i8; 2]> = Vec::new();
-//         return e;
-//     }
-//     fn get_key(&self) -> i8 {
-//         return 0;
-//     }
-
-//     fn get_pos(&self) -> [i8; 2] {
-//         return self.pos;
-//     }
-// }
 
 impl Moves for Pawn {
 
@@ -359,15 +341,14 @@ impl Moves for Queen {
 /*
 TODO:
 i8 -> i4
-Condense vectors in Tower/Bishop
 Castling
 Factor out bound checking and call in each piece
-Fix tests.rs to use methods instead of direct access
 Upgrade pawns
 Add bound checking function
 Add check test within each piece move_set
     *Needs to happen because the opponent algos aren't going
     to do checking if a move is legal or not
+Fix stalemate: 
 */
 
 // *************************************************************************************
