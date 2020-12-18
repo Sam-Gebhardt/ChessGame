@@ -76,6 +76,24 @@ fn tb_helper(key: i8, pos: [i8; 3], flags: &mut [bool; 4], moves: &mut Vec<[i8; 
     }
 }
 
+fn check_helper(board: &mut Board, src: [i8; 2], moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
+    // Make sure moves for each piece don't cause a check to happen
+
+    let mut key: i8 = 0;
+    if moves.len() != 0 {
+         key = board.get_piece(src[0], src[1]);
+    }
+
+    let mut legal_moves: Vec<[i8; 2]> = Vec::new();
+    for i in 0..moves.len(){
+        if !sign_checker(board.in_check(src, moves[i]), key) {
+            legal_moves.push(moves[i]);
+        }
+    }
+
+    return legal_moves;
+}
+
 pub trait Moves {
 
     // Empty methods to overwrite by each piece
