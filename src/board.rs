@@ -58,16 +58,16 @@ impl Board {
 
         // put the pawns on the board
         for i in 0..8 {
-            self.b[1][i] = 1;
-            self.b[6][i] = -1;
+            self.b[1][i] = -1;
+            self.b[6][i] = 1;
         }
 
         // put non pawns on the board
         let mut start = 2;
         let mut change = 1;
         for i in 0..8 {
-            self.b[0][i] = start;
-            self.b[7][i] = start * -1;
+            self.b[0][i] = start * -1;
+            self.b[7][i] = start;
             start += change;
             if start == 7 {
                 start -= 3;
@@ -75,11 +75,11 @@ impl Board {
             }
         }
         // King and queen should be on opposite sides
-        self.b[7][3] = -6;
-        self.b[7][4] = -5;
+        self.b[0][3] = -6;
+        self.b[0][4] = -5;
 
-        self.white = [0, 3];
-        self.black = [7, 4];
+        self.black = [0, 3];
+        self.white = [7, 4];
     }
 
     pub fn print_b(&self) {
