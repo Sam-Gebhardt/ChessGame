@@ -106,7 +106,6 @@ impl Moves for Pawn {
         if (self.pos[0] == 6 && self.key == 1) || (self.pos[0] == 1 && self.key == -1) {
             valid.push([self.pos[0] + direction * 2, self.pos[1]]);
         }
-        println!("{:?}", valid);
 
         // Move forward 1 
         valid.push([self.pos[0] + direction, self.pos[1]]);
@@ -350,6 +349,7 @@ Add check test within each piece move_set
     *Needs to happen because the opponent algos aren't going
     to do checking if a move is legal or not
 Fix in_check: Both could be in check, pass key to funct
+Completely rewrite in check
 */
 
 // *************************************************************************************

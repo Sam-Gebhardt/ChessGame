@@ -3,6 +3,8 @@ use std::io::Write;
 use char;
 use crate::pieces::piece_type;
 use crate::pieces::Moves;
+use crate::pieces::sign_checker;
+
 
 
 fn alpha(n: i8) -> char {
@@ -75,8 +77,8 @@ impl Board {
             }
         }
         // King and queen should be on opposite sides
-        self.b[0][3] = -6;
-        self.b[0][4] = -5;
+        self.b[7][3] = 6;
+        self.b[7][4] = 5;
 
         self.black = [0, 3];
         self.white = [7, 4];
@@ -226,8 +228,9 @@ impl Board {
                         self.move_piece(dest, src);
                         return -6; //black is in check
                     }
-                } else {
+                } else if piece.get_key() < 0{
                     if piece.move_set(&self).contains(&self.white) {
+                        println!("pos: {:?}\nset: {:?} + key: {}\nking: {:?}", piece.get_pos(), piece.move_set(&self), piece.get_key(), self.white);
                         self.move_piece(dest, src);
                         return 6; // white is in check
                     }
@@ -273,35 +276,27 @@ impl Board {
         return false;
     }
 
-    pub fn stalemate(&self) -> bool {
+    pub fn stalemate(&self, key: i8) -> bool {
         // no legal moves, but not in check
+        // key should be the sign of who's turn it is 
 
         let mut piece: Box<dyn Moves>;
         let mut moves: Vec<[i8; 2]>;
-        let mut black = true;
-        let mut white = true;
 
         // loop through the board, if a piece has a move then there is no stalemate
         for i in 0..8 {
             for j in 0..8 {
-                if black && self.get_piece(i, j) < 0 {
+                if sign_checker(self.get_piece(i, j), key) {
                     piece = piece_type(self.get_piece(i, j), [i, j]);
                     moves = piece.move_set(&self);
 
                     if moves.len() != 0 { 
-                        black = false;
+                        return false;
                     }
-                } else if white && self.get_piece(i, j) > 0 {
-                    piece = piece_type(self.get_piece(i, j), [i, j]);
-                    moves = piece.move_set(&self);
-
-                    if moves.len() != 0 { 
-                        white = false;
-                    }
-                }
+                } 
             }
         }
         
-        return black || white;
+        return true;
     }
 }
