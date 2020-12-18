@@ -6,7 +6,6 @@ use crate::pieces::Moves;
 use crate::pieces::sign_checker;
 
 
-
 fn alpha(n: i8) -> char {
     // Converts index to alpha char
     let a: char = match n {
@@ -181,7 +180,7 @@ impl Board {
             return false
         }
 
-        if self.in_check(src, dest) != 0 {
+        if self.in_check(src, dest) == 6 {
             println!("Move puts you in check.");
             return false;
         }
@@ -244,9 +243,10 @@ impl Board {
     pub fn check_mate(&mut self) -> bool {
         // King is currently in check and can't move
 
-        let check: i8 = self.in_check([0, 0], [0, 0]);
+        let helper = self.check_mate_helper();
+        let check: i8 = self.in_check(helper, helper);
         let pos: [i8; 2];
-        let piece: Box<dyn Moves>;
+        let mut piece: Box<dyn Moves>;
         let color: i8;
 
         if check == -6 { 
@@ -263,19 +263,45 @@ impl Board {
             return false
         }
 
-        let moves: Vec<[i8; 2]> = piece.move_set(&self);
-        if moves.len() == 0 {
+        let mut moves: Vec<[i8; 2]> = piece.move_set(&self);
+        if moves.len() == 0 { // this works assuming each piece filters out for check
             return true;
         }
 
-        for i in 0..moves.len() {
-            if self.in_check(pos, moves[i]) == color {
-                return true;
+        // Must check if each piece can protect the king
+        for i in 0..8 {
+            for j in 0..8 {
+                if sign_checker(self.get_piece(i, j), color) {
+                    piece = piece_type(self.get_piece(i, j), [i, j]);
+                    moves = piece.move_set(&self);
+                    for a in 0..moves.len() {
+                        if self.in_check(piece.get_pos(), moves[a]) == color {
+                            return false;
+                        }
+                    }
+
+                }
             }
         }
-        return false;
+
+        return true; // check everyfriendly piece and see if still in check
     }
 
+    fn check_mate_helper(&self) -> [i8; 2] {
+        // finds an empty space to see if current state is in check
+
+        for i in 2..8 {
+            for j in 0..8 {
+                if self.get_piece(i, j) == 0 {
+                    return [i, j];
+                }
+            }
+        }
+        // to make the compliler happy, but there must be an empty space on the board
+        return [0, 0];
+    }
+
+    #[allow(dead_code)]
     pub fn stalemate(&self, key: i8) -> bool {
         // no legal moves, but not in check
         // key should be the sign of who's turn it is 

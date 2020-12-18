@@ -350,6 +350,8 @@ Add check test within each piece move_set
     to do checking if a move is legal or not
 Fix in_check: Both could be in check, pass key to funct
 Completely rewrite in check
+Maintain pos of each piece/color in board?
+Random must determine if its in check
 */
 
 // *************************************************************************************
