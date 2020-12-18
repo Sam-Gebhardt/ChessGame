@@ -149,8 +149,11 @@ impl Board {
         let parsed_from: [i8; 2] = convert_user_input(from);
         let parsed_to: [i8; 2] = convert_user_input(to);
 
-        if !self.legal_move(parsed_from, parsed_to) {
-            println!("Illegal move!");
+        if self.get_piece(parsed_from[0], parsed_from[1]) < 0 {
+            println!("Can't move enemy pieces. (You are white)\n");
+            self.get_input();
+        } else if !self.legal_move(parsed_from, parsed_to) {
+            println!("Illegal move!\n");
             self.get_input();
         } else {
             self.move_piece(parsed_from, parsed_to);
@@ -184,7 +187,7 @@ impl Board {
         return true;
     }
 
-    pub fn set_king(&mut self, key: i8, pos: [i8; 2]) {
+    fn set_king(&mut self, key: i8, pos: [i8; 2]) {
         if key > 0 {
             self.white = pos;
         }
@@ -209,7 +212,7 @@ impl Board {
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
+    fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
         // See if a move cause a check to happen
 
         self.move_piece(src, dest);
@@ -270,35 +273,35 @@ impl Board {
         return false;
     }
 
-    // pub fn stalemate(&mut self) -> bool {
+    pub fn stalemate(&self) -> bool {
         // no legal moves, but not in check
 
-        /* Move complex than this:
-        Could have stalemate with multible pieces
+        let mut piece: Box<dyn Moves>;
+        let mut moves: Vec<[i8; 2]>;
+        let mut black = true;
+        let mut white = true;
+
+        // loop through the board, if a piece has a move then there is no stalemate
+        for i in 0..8 {
+            for j in 0..8 {
+                if black && self.get_piece(i, j) < 0 {
+                    piece = piece_type(self.get_piece(i, j), [i, j]);
+                    moves = piece.move_set(&self);
+
+                    if moves.len() != 0 { 
+                        black = false;
+                    }
+                } else if white && self.get_piece(i, j) > 0 {
+                    piece = piece_type(self.get_piece(i, j), [i, j]);
+                    moves = piece.move_set(&self);
+
+                    if moves.len() != 0 { 
+                        white = false;
+                    }
+                }
+            }
+        }
         
-
-
-        */
-        // let mut white: Vec<[i8; 2]>;
-        // let mut black: Vec<[i8; 2]>;
-
-        // let white_king: Box<dyn Moves> = piece_type(self.get_piece(self.white[0], self.white[1]), self.white);
-        // let black_king: Box<dyn Moves> = piece_type(self.get_piece(self.black[0], self.black[1]), self.black);
-
-        // white = white_king.move_set(&self);
-        // black = black_king.move_set(&self);
-
-        // for i in 0..white.len() {
-        //     if self.in_check(self.white, white[i]) != 6 {
-        //         return false;
-        //     }
-        // }
-
-        // for i in 0..black.len() {
-        //     if self.in_check(self.black, black[i]) != -6 {
-        //         return false;
-        //     }
-        // }
-        // return true;
-    // }
+        return black || white;
+    }
 }
