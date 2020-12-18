@@ -5,18 +5,18 @@ use crate::pieces::piece_type;
 use crate::pieces::Moves;
 
 
-fn alpha(n: i8) -> &'static str {
+fn alpha(n: i8) -> char {
     // Converts index to alpha char
-    let a: &'static str = match n {
-        0 => "a",
-        1 => "b",
-        2 => "c",
-        3 => "d",
-        4 => "e",
-        5 => "f",
-        6 => "g",
-        7 => "h",
-        _ => "a",
+    let a: char = match n {
+        0 => 'a',
+        1 => 'b',
+        2 => 'c',
+        3 => 'd',
+        4 => 'e',
+        5 => 'f',
+        6 => 'g',
+        7 => 'h',
+        _ => 'a',
     };
     return a;
 }
@@ -209,7 +209,7 @@ impl Board {
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
+    pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
         // See if a move cause a check to happen
 
         self.move_piece(src, dest);
@@ -270,7 +270,7 @@ impl Board {
         return false;
     }
 
-    pub fn stalemate(&mut self) -> bool {
+    // pub fn stalemate(&mut self) -> bool {
         // no legal moves, but not in check
 
         /* Move complex than this:
@@ -300,20 +300,5 @@ impl Board {
         //     }
         // }
         // return true;
-    }
+    // }
 }
-
-// Idea for testing check:
-/*
-Board maintains pos of white/black king 
-Loop through each piece and check if kings are in an avabilbe move
-Should each piece maintain a vec of open moves?
-    -Makes sense if a graphics point of view 
-    -Maybe implement with graphics
-
-CheckMate:
-
-
-
-*/
-

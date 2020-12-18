@@ -1,6 +1,8 @@
 mod pieces;
 mod board;
-mod random;
+use AI::random::random_move;
+mod AI { pub mod random; }
+
 
 // use crate::pieces::Moves;
 // use crate::board;
@@ -59,7 +61,7 @@ fn main() {
         }
 
         // An opponent that chooses a random piece to move
-        random::random_move(&mut board);
+        random_move(&mut board);
 
         if board.check_mate() {
             println!("Game over!");

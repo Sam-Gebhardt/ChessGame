@@ -166,10 +166,10 @@ impl Moves for Pawn {
 }
 
 impl Moves for Tower {
-    // Can move NSEW, till it reaches a piece or border
     // Todo: Castling
 
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
+        
         let mut moves: Vec<[i8; 2]> = Vec::new();
 
         // flag is set to false if piece is encoutered
@@ -215,7 +215,7 @@ impl Moves for Tower {
 
 impl Moves for Knight {
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
-        // Can move in an L shape, 8 possible moves
+
         let mut moves: Vec<[i8; 2]> = Vec::new();
         let mut legal_moves: Vec<[i8; 2]> = Vec::new();
 
@@ -365,6 +365,9 @@ Factor out bound checking and call in each piece
 Fix tests.rs to use methods instead of direct access
 Upgrade pawns
 Add bound checking function
+Add check test within each piece move_set
+    *Needs to happen because the opponent algos aren't going
+    to do checking if a move is legal or not
 */
 
 // *************************************************************************************
