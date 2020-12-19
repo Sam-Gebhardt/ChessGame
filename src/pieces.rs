@@ -76,7 +76,7 @@ fn tb_helper(key: i8, pos: [i8; 3], flags: &mut [bool; 4], moves: &mut Vec<[i8; 
     }
 }
 
-fn check_helper(board: &mut Board, src: [i8; 2], moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
+fn check_helper(board: &Board, src: [i8; 2], moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
     // Make sure moves for each piece don't cause a check to happen
 
     let mut key: i8 = 0;
@@ -84,9 +84,13 @@ fn check_helper(board: &mut Board, src: [i8; 2], moves: Vec<[i8; 2]>) -> Vec<[i8
          key = board.get_piece(src[0], src[1]);
     }
 
+    // Cloning because each piece Impl is given a immuatable reference, so by cloning
+    // we can alter the board
+    let mut copy: Board = board.clone();
+
     let mut legal_moves: Vec<[i8; 2]> = Vec::new();
     for i in 0..moves.len(){
-        if !sign_checker(board.in_check(src, moves[i]), key) {
+        if !sign_checker(copy.in_check(src, moves[i]), key) {
             legal_moves.push(moves[i]);
         }
     }
@@ -153,7 +157,7 @@ impl Moves for Pawn {
                 all_moves.push(valid[i]);
             }
         }
-        return all_moves;
+        return check_helper(board, self.pos, all_moves);
     }
 
     fn get_key(&self) -> i8 {
@@ -201,7 +205,7 @@ impl Moves for Tower {
             }
         }
 
-        return moves;
+        return check_helper(board, self.pos, moves);
     }
 
     fn get_key(&self) -> i8 {
@@ -240,7 +244,7 @@ impl Moves for Knight {
             }
         }
         
-        return legal_moves;
+        return check_helper(board, self.pos, legal_moves);
     }
 
     fn get_key(&self) -> i8 {
@@ -287,7 +291,7 @@ impl Moves for Bishop {
             }
             //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
-        return moves;
+        return check_helper(board, self.pos, all_moves);
     }
 
     fn get_key(&self) -> i8 {
@@ -321,7 +325,7 @@ impl Moves for King {
                 open_moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
-        return open_moves;
+        return check_helper(board, self.pos, open_moves);
     }
 
     fn get_key(&self) -> i8 {
