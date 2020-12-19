@@ -53,6 +53,7 @@ pub struct Board {
     pub black: [i8; 2]
 }
 
+
 impl Board {
     //Fill the board with pieces
     pub fn construct(&mut self) { 
@@ -180,7 +181,7 @@ impl Board {
             return false
         }
 
-        if self.in_check(src, dest) == 6 {
+        if self.in_check(src, dest, 1) {
             println!("Move puts you in check.");
             return false;
         }
@@ -213,69 +214,56 @@ impl Board {
         self.b[src[0] as usize][src[1] as usize] = 0;
     }
 
-    pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2]) -> i8 {
+    pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2], key: i8) -> bool {
         // See if a move cause a check to happen
 
         self.move_piece(src, dest);
+        let mut piece_key: i8;
+        let king = if key > 0 {&self.white} else {&self.black};
 
         for i in 0..8 {
             for j in 0..8 {
-                let piece: Box<dyn Moves> = piece_type(self.get_piece(i, j), [i, j]);
+                piece_key = self.get_piece(i, j);
 
-                if piece.get_key() > 0 {
-                    if piece.move_set(&self).contains(&self.black) {
+                if !sign_checker(key, piece_key) && piece_key != 0 {
+                    let piece: Box<dyn Moves> = piece_type(piece_key, [i, j]);
+
+                    if piece.move_set(&self).contains(king) {
                         self.move_piece(dest, src);
-                        return -6; //black is in check
+                        return true; 
                     }
-                } else if piece.get_key() < 0{
-                    if piece.move_set(&self).contains(&self.white) {
-                        println!("pos: {:?}\nset: {:?} + key: {}\nking: {:?}", piece.get_pos(), piece.move_set(&self), piece.get_key(), self.white);
-                        self.move_piece(dest, src);
-                        return 6; // white is in check
-                    }
-                }
+                }  
             }
         }
         self.move_piece(dest, src);
-        return 0; //not in check
+        return false; 
     }
 
-    pub fn check_mate(&mut self) -> bool {
-        // King is currently in check and can't move
+    pub fn check_mate(&mut self, key: i8) -> bool {
+        // Test if key color is in checkmate
 
         let helper = self.check_mate_helper();
-        let check: i8 = self.in_check(helper, helper);
-        let pos: [i8; 2];
+        let check: bool = self.in_check(helper, helper, key);
+        let pos: [i8; 2] = if key > 0 {self.white} else {self.black};
+
         let mut piece: Box<dyn Moves>;
-        let color: i8;
+        let mut moves: Vec<[i8; 2]>;
 
-        if check == -6 { 
-            pos = self.black;
-            piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
-            color = -6;
 
-        } else if check == 6 {
-            pos = self.white;
-            piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
-            color = 6;
-
-        } else {
-            return false
+        if !check { 
+            return false;
         }
 
-        let mut moves: Vec<[i8; 2]> = piece.move_set(&self);
-        if moves.len() == 0 { // this works assuming each piece filters out for check
-            return true;
-        }
 
-        // Must check if each piece can protect the king
+        // Must check if any piece can protect the king
         for i in 0..8 {
             for j in 0..8 {
-                if sign_checker(self.get_piece(i, j), color) {
+                if sign_checker(self.get_piece(i, j), key) {
                     piece = piece_type(self.get_piece(i, j), [i, j]);
                     moves = piece.move_set(&self);
+
                     for a in 0..moves.len() {
-                        if self.in_check(piece.get_pos(), moves[a]) == color {
+                        if !self.in_check(piece.get_pos(), moves[a], key) {
                             return false;
                         }
                     }
@@ -284,10 +272,10 @@ impl Board {
             }
         }
 
-        return true; // check everyfriendly piece and see if still in check
+        return true; 
     }
 
-    fn check_mate_helper(&self) -> [i8; 2] {
+    pub fn check_mate_helper(&self) -> [i8; 2] {
         // finds an empty space to see if current state is in check
 
         for i in 2..8 {
@@ -326,6 +314,7 @@ impl Board {
         return true;
     }
 }
+
 
 //*******************************************************************************************************
 // Test cases for private functions/methods/structs
