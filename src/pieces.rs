@@ -101,7 +101,7 @@ impl Moves for Pawn {
 
         let direction = self.key * -1; 
 
-        let mut all_moves: Vec<[i8; 2]> = Vec::new();
+        let mut moves: Vec<[i8; 2]> = Vec::new();
         let mut valid: Vec<[i8; 2]> = Vec::new();
 
         // Check if Pawn can move 2 spaces
@@ -116,7 +116,7 @@ impl Moves for Pawn {
         for i in 0..valid.len() {
 
             if board.get_piece(valid[i][0], valid[i][1]) == 0 {
-                all_moves.push(valid[i]);
+                moves.push(valid[i]);
             }
         }
         valid.clear();
@@ -135,10 +135,10 @@ impl Moves for Pawn {
 
             // Can't use signal_checker fn because 0 is a special case for Pawns
             if !((self.key > 0 && diagonal >= 0) || (self.key < 0 && diagonal <= 0)) {
-                all_moves.push(valid[i]);
+                moves.push(valid[i]);
             }
         }
-        return all_moves;
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -214,17 +214,17 @@ impl Moves for Knight {
             if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
                  x + changes[i][1] > 7 || x + changes[i][1] < 0) {
 
-                moves.push([y + changes[i][0], x + changes[i][1]])
+                legal_moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
 
-        for i in 0..moves.len() {
-            if !sign_checker(self.key, board.get_piece(moves[i][0], moves[i][1])) {
-                legal_moves.push(moves[i]);
+        for i in 0..legal_moves.len() {
+            if !sign_checker(self.key, board.get_piece(legal_moves[i][0], legal_moves[i][1])) {
+                moves.push(moves[i]);
             }
         }
         
-        return legal_moves;
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -290,7 +290,7 @@ impl Moves for King {
         let changes: [[i8; 2]; 8] = [[1, 0], [1, -1], [0, -1], [-1, -1], 
                                      [-1, 0], [-1, 1], [0, 1], [1, 1]];
         
-        let mut open_moves: Vec<[i8; 2]> = Vec::new();
+        let mut moves: Vec<[i8; 2]> = Vec::new();
         let x = self.pos[1];
         let y = self.pos[0];
 
@@ -302,10 +302,10 @@ impl Moves for King {
             }
 
             if !sign_checker(self.key, board.get_piece(y + changes[i][0], x + changes[i][1])) {
-                open_moves.push([y + changes[i][0], x + changes[i][1]])
+                moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
-        return open_moves;
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -324,11 +324,11 @@ impl Moves for Queen {
         let t: Tower = Tower{pos: self.pos, key: self.key};
         let b: Bishop = Bishop{pos: self.pos, key: self.key};
 
-        let mut b_moves: Vec<[i8; 2]> = b.move_set(board);
+        let mut moves: Vec<[i8; 2]> = b.move_set(board);
         let mut t_moves: Vec<[i8; 2]> = t.move_set(board);
 
-        b_moves.append(&mut t_moves);
-        return b_moves;
+        moves.append(&mut t_moves);
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
