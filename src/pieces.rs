@@ -3,6 +3,7 @@ This file holds the classes of each piece and their respective moves
 */
 use crate::board::Board;
 
+
 pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
     let abs_key = key.abs();
 
@@ -52,9 +53,9 @@ struct Queen {
 pub fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
     // else return false
-    if two == 0 {
-        return false;
-    }
+    // if two == 0 {
+    //     return false;
+    // }
     if one > 0 && two > 0 {
         return true;
 
@@ -68,34 +69,13 @@ fn tb_helper(key: i8, pos: [i8; 3], flags: &mut [bool; 4], moves: &mut Vec<[i8; 
 
     if board.get_piece(pos[1], pos[0]) != 0 {
         flags[pos[2] as usize] = false;
+
         if !sign_checker(key, board.get_piece(pos[1], pos[0])) {
             moves.push([pos[1], pos[0]]);
         }
     } else {
         moves.push([pos[1], pos[0]]);
     }
-}
-
-fn check_helper(board: &Board, src: [i8; 2], moves: Vec<[i8; 2]>) -> Vec<[i8; 2]> {
-    // Make sure moves for each piece don't cause a check to happen
-
-    let mut key: i8 = 0;
-    if moves.len() != 0 {
-         key = board.get_piece(src[0], src[1]);
-    }
-
-    // Cloning because each piece Impl is given a immuatable reference, so by cloning
-    // we can alter the board
-    let mut copy: Board = board.clone();
-
-    let mut legal_moves: Vec<[i8; 2]> = Vec::new();
-    for i in 0..moves.len(){
-        if !sign_checker(copy.in_check(src, moves[i]), key) {
-            legal_moves.push(moves[i]);
-        }
-    }
-
-    return legal_moves;
 }
 
 pub trait Moves {
@@ -134,6 +114,7 @@ impl Moves for Pawn {
 
         // Does a piece occupy a position where the pawn would move?
         for i in 0..valid.len() {
+
             if board.get_piece(valid[i][0], valid[i][1]) == 0 {
                 all_moves.push(valid[i]);
             }
@@ -157,7 +138,7 @@ impl Moves for Pawn {
                 all_moves.push(valid[i]);
             }
         }
-        return check_helper(board, self.pos, all_moves);
+        return all_moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -204,8 +185,7 @@ impl Moves for Tower {
 
             }
         }
-
-        return check_helper(board, self.pos, moves);
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -244,7 +224,7 @@ impl Moves for Knight {
             }
         }
         
-        return check_helper(board, self.pos, legal_moves);
+        return legal_moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -291,7 +271,7 @@ impl Moves for Bishop {
             }
             //todo: rewrite by multiplying [1,1], [-1, 1], [1, -1], [-1,-1] by i and adding
         }
-        return check_helper(board, self.pos, all_moves);
+        return moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -325,7 +305,7 @@ impl Moves for King {
                 open_moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
-        return check_helper(board, self.pos, open_moves);
+        return open_moves;
     }
 
     fn get_key(&self) -> i8 {
@@ -362,16 +342,9 @@ impl Moves for Queen {
 
 /*
 TODO:
-i8 -> i4
 Castling
-Factor out bound checking and call in each piece
 Upgrade pawns
-Add bound checking function
-Add check test within each piece move_set
-    *Needs to happen because the opponent algos aren't going
-    to do checking if a move is legal or not
-Fix in_check: Both could be in check, pass key to funct
-Completely rewrite in check
+Add fn to remove moves that put player in check
 Maintain pos of each piece/color in board?
 Random must determine if its in check
 */
