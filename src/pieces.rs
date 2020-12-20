@@ -3,7 +3,6 @@ This file holds the classes of each piece and their respective moves
 */
 use crate::board::Board;
 
-
 pub fn piece_type(key: i8, pos: [i8; 2]) -> Box<dyn Moves>{
     let abs_key = key.abs();
 
@@ -206,21 +205,21 @@ impl Moves for Knight {
         let x = self.pos[1];
         let y = self.pos[0];
 
-        // Bound check
         for i in 0..8 {
+            // Bound check
             if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
                  x + changes[i][1] > 7 || x + changes[i][1] < 0) {
 
-                legal_moves.push([y + changes[i][0], x + changes[i][1]])
+                    legal_moves.push([y + changes[i][0], x + changes[i][1]])
             }
         }
 
-        // is there a friendly in the spot
         for i in 0..legal_moves.len() {
             if !sign_checker(self.key, board.get_piece(legal_moves[i][0], legal_moves[i][1])) {
-                moves.push(moves[i]);
+                moves.push(legal_moves[i]);
             }
         }
+        
         return moves;
     }
 
@@ -349,6 +348,7 @@ Add fn to remove moves that put player in check
 Maintain pos of each piece/color in board?
 Random must determine if its in check
 Move piece_type to board
+Fix random by calling in_check in choose_move
 */
 
 // *************************************************************************************
