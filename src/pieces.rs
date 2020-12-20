@@ -52,10 +52,7 @@ struct Queen {
 
 pub fn sign_checker(one: i8, two: i8) -> bool {
     // return true if the numbers are the same sign
-    // else return false
-    // if two == 0 {
-    //     return false;
-    // }
+
     if one > 0 && two > 0 {
         return true;
 
@@ -66,6 +63,8 @@ pub fn sign_checker(one: i8, two: i8) -> bool {
 }
 
 fn tb_helper(key: i8, pos: [i8; 3], flags: &mut [bool; 4], moves: &mut Vec<[i8; 2]>, board: &Board) {
+    // Helper func to get moves for tower and bishop
+    // Checks if there is a piece in spot, and if that piece is friendly
 
     if board.get_piece(pos[1], pos[0]) != 0 {
         flags[pos[2] as usize] = false;
@@ -162,10 +161,7 @@ impl Moves for Tower {
         let x = self.pos[1];
         let y = self.pos[0];
 
-        // Check if possible move is inbounds and if move is not behind another piece
-        // Then check if a piece occupys that space. If one is there set flag to false
-        // and check if piece is enemy or friedly, otherwise space is open
-        // Do check for each direction
+        // Go vertical and horizontal and call helper func
         for i in 1..9 { 
             if x + i < 8 && flags[0] {
 
@@ -198,6 +194,7 @@ impl Moves for Tower {
 }
 
 impl Moves for Knight {
+
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
 
         let mut moves: Vec<[i8; 2]> = Vec::new();
@@ -209,8 +206,8 @@ impl Moves for Knight {
         let x = self.pos[1];
         let y = self.pos[0];
 
+        // Bound check
         for i in 0..8 {
-            // Bound check
             if !(y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
                  x + changes[i][1] > 7 || x + changes[i][1] < 0) {
 
@@ -218,12 +215,12 @@ impl Moves for Knight {
             }
         }
 
+        // is there a friendly in the spot
         for i in 0..legal_moves.len() {
             if !sign_checker(self.key, board.get_piece(legal_moves[i][0], legal_moves[i][1])) {
                 moves.push(moves[i]);
             }
         }
-        
         return moves;
     }
 
@@ -237,6 +234,7 @@ impl Moves for Knight {
 }
 
 impl Moves for Bishop {
+
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]>{
         // Can move in the diagonal until it reaches a piece or border
 
@@ -247,10 +245,7 @@ impl Moves for Bishop {
         let x = self.pos[1];
         let y = self.pos[0];
 
-        // Check if possible move is inbounds and if move is not behind another piece
-        // Then check if a piece occupys that space. If one is there set flag to false
-        // and check if piece is enemy or friedly, otherwise space is open
-        // Do check for each direction
+        // Spread out diagonal and call helper funct
         for i in 1..9 { 
             if (x + i < 8) && (y + i < 8) && flags[0] {
 
@@ -264,7 +259,7 @@ impl Moves for Bishop {
 
                 tb_helper(self.key, [x - i, y + i, 2], &mut flags, &mut moves, board);
 
-            } if(x - i > -1) && (y - i > -1) && flags[3] {
+            } if (x - i > -1) && (y - i > -1) && flags[3] {
 
                 tb_helper(self.key, [x - i, y - i, 3], &mut flags, &mut moves, board);
 
@@ -284,6 +279,7 @@ impl Moves for Bishop {
 }
 
 impl Moves for King {
+
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
 
         // All 8 possible moves for a King
@@ -291,16 +287,20 @@ impl Moves for King {
                                      [-1, 0], [-1, 1], [0, 1], [1, 1]];
         
         let mut moves: Vec<[i8; 2]> = Vec::new();
+
         let x = self.pos[1];
         let y = self.pos[0];
 
         for i in 0..8 {
+
+            // bound check
             if y + changes[i][0] > 7 || y + changes[i][0] < 0 ||
                x + changes[i][1] > 7 || x + changes[i][1] < 0 {
                 
                 continue;
             }
 
+            // is there a friendly
             if !sign_checker(self.key, board.get_piece(y + changes[i][0], x + changes[i][1])) {
                 moves.push([y + changes[i][0], x + changes[i][1]])
             }
@@ -318,9 +318,10 @@ impl Moves for King {
 }
 
 impl Moves for Queen {
-    // Call tower + bishop 
+
     fn move_set(&self, board: &Board) -> Vec<[i8; 2]> {
 
+        // Call tower + bishop 
         let t: Tower = Tower{pos: self.pos, key: self.key};
         let b: Bishop = Bishop{pos: self.pos, key: self.key};
 
@@ -347,6 +348,7 @@ Upgrade pawns
 Add fn to remove moves that put player in check
 Maintain pos of each piece/color in board?
 Random must determine if its in check
+Move piece_type to board
 */
 
 // *************************************************************************************
