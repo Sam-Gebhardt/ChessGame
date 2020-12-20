@@ -1,6 +1,7 @@
 mod pieces;
 mod board;
 use AI::random::random_move;
+#[allow(non_snake_case)]
 mod AI { pub mod random; }
 
 
@@ -29,8 +30,6 @@ knight = 3
 bishop = 4
 king = 5
 queen = 6
-
-Each piece is a heap allocated trait 
 */
 
 
@@ -44,27 +43,37 @@ fn main() {
     }; 
 
     // Construct the board
-    board.construct();
+    // board.construct();
+    board.b[1][3] = 2;
+    board.b[0][0] = -5;
+    board.b[5][1] = 2; 
 
     // print the starting board
     board.print_b();
-    // for _i in 0..5 {
-    //     random::choose_move(&mut board);
-    // }
+
     loop {
         if !(board.user_move()) {
             break;
         }
-        if board.check_mate() {
-            println!("Game over!");
+
+        if board.check_mate(-1) {
+            println!("Game over! \nWhite wins");
+            board.print_b();
+            break;
+        } else if board.stalemate(-1) {
+            println!("Stalemate!");
             break;
         }
 
         // An opponent that chooses a random piece to move
         random_move(&mut board);
 
-        if board.check_mate() {
-            println!("Game over!");
+        if board.check_mate(1) {
+            println!("Game over! \nBlack wins");
+            board.print_b();
+            break;
+        } else if board.stalemate(1) {
+            println!("Stalemate!");
             break;
         }
 

@@ -12,8 +12,42 @@ pub fn random_move(board: &mut Board) {
 }
 
 fn make_move(board: &mut Board) {
-    let _move: [[i8; 2]; 2] = choose_move(board);
-    board.move_piece(_move[0], _move[1]);
+
+    if board.in_check(board.check_mate_helper(), board.check_mate_helper(), -1) {
+        let save = block(board);
+        board.move_piece(save[0], save[1]);
+    } else {
+        let _move: [[i8; 2]; 2] = choose_move(board);
+        board.move_piece(_move[0], _move[1]);
+    }
+}
+
+fn block(board: &mut Board) -> [[i8; 2]; 2] {
+    // Returns a move that protects the king
+
+    let mut saving_moves: Vec<[[i8; 2]; 2]> = Vec::new();
+    let mut moves: Vec<[i8; 2]>;
+
+    for i in 0..8 {
+        for j in 0..8 {
+
+            if board.get_piece(i, j) < 0 {
+                let piece: Box<dyn Moves> = piece_type(board.get_piece(i, j), [i, j]);
+                moves = piece.move_set(board);
+
+                for a in 0..moves.len() {
+                    if !board.in_check(piece.get_pos(), moves[a], -1) {
+                        saving_moves.push([piece.get_pos(), moves[a]]);
+                    }
+                }
+            }
+        }
+    }
+    if saving_moves.len() == 0 {
+        return [[0, 0], [0, 0]]; // Indicates check mate
+    }
+    let select = thread_rng().gen_range(0, saving_moves.len());
+    return saving_moves[select];
 }
 
 fn choose_move(board: &mut Board) -> [[i8; 2]; 2] {

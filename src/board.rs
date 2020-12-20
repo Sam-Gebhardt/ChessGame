@@ -243,6 +243,7 @@ impl Board {
 
     pub fn check_mate(&mut self, key: i8) -> bool {
         // Test if key color is in checkmate
+        // *Is dependent of check moves being filtered out in pieces*
 
         let helper = self.check_mate_helper();
         let check: bool = self.in_check(helper, helper, key);
@@ -254,7 +255,7 @@ impl Board {
         if !check { 
             return false;
         }
-        
+
         piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
         if piece.move_set(&self).len() != 0 {
             return false;
