@@ -50,6 +50,29 @@ fn block(board: &mut Board) -> [[i8; 2]; 2] {
     return saving_moves[select];
 }
 
+fn rechoose(board: Board, piece_list: Vec<Box<dyn Moves>>) -> [[i8; 2]; 2] {
+    // Choose a move till a valid one is picked
+
+    let mut ran: usize; 
+    let mut ran2:usize; 
+    let mut moves: Vec<[i8; 2]>; 
+    let mut board_copy: Board;
+
+    // Could be very slow depending on board
+    loop {
+        board_copy = board.clone();
+        ran = thread_rng().gen_range(0, piece_list.len());
+
+        moves = piece_list[ran].move_set(&board);
+        ran2 = thread_rng().gen_range(0, moves.len());
+
+        println!("{:?} and {:?}", piece_list[ran].get_pos(), moves[ran2]);
+        if !board_copy.in_check(piece_list[ran].get_pos(), moves[ran2], -1) {
+            return [piece_list[ran].get_pos(), moves[ran2]];
+        }
+    }
+}
+
 fn choose_move(board: &mut Board) -> [[i8; 2]; 2] {
     // Opponent will always be black pieces
 
@@ -70,9 +93,12 @@ fn choose_move(board: &mut Board) -> [[i8; 2]; 2] {
         }
     }
 
-    let select = thread_rng().gen_range(0, piece_list.len());
-    moves = piece_list[select].move_set(&board);
-    let r = thread_rng().gen_range(0, moves.len());
+    let ran = thread_rng().gen_range(0, piece_list.len());
+    moves = piece_list[ran].move_set(&board);
+    let ran2 = thread_rng().gen_range(0, moves.len());
     
-    return [piece_list[select].get_pos(), moves[r]];
+    if board.in_check(piece_list[ran].get_pos(), moves[ran2], -1) {
+        return rechoose(*board, piece_list);
+    }
+    return [piece_list[ran].get_pos(), moves[ran2]];
 }
