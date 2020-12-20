@@ -47,12 +47,12 @@ fn convert_user_input(input: String) -> [i8; 2] {
     return pos;
 }
 
+#[derive(Copy, Clone)]
 pub struct Board {
     pub b: [[i8; 8]; 8],
     pub white: [i8; 2],
     pub black: [i8; 2]
 }
-
 
 impl Board {
     //Fill the board with pieces
@@ -204,6 +204,7 @@ impl Board {
 
     pub fn move_piece(&mut self, src: [i8; 2], dest: [i8; 2]) {
         // Move a piece from src to dest, set src to 0
+
         let key: i8 = self.get_piece(src[0], src[1]);
 
         if key == 5 || key == -5 {
@@ -217,25 +218,26 @@ impl Board {
     pub fn in_check(&mut self, src: [i8; 2], dest: [i8; 2], key: i8) -> bool {
         // See if a move cause a check to happen
 
-        self.move_piece(src, dest);
+        let mut board_copy = self.clone();
+        board_copy.move_piece(src, dest);
+
+        let king = if key > 0 {&board_copy.white} else {&board_copy.black};
+        let mut piece: Box<dyn Moves>;
         let mut piece_key: i8;
-        let king = if key > 0 {&self.white} else {&self.black};
 
         for i in 0..8 {
             for j in 0..8 {
-                piece_key = self.get_piece(i, j);
+                piece_key = board_copy.get_piece(i, j);
 
                 if !sign_checker(key, piece_key) && piece_key != 0 {
-                    let piece: Box<dyn Moves> = piece_type(piece_key, [i, j]);
+                    piece = piece_type(piece_key, [i, j]);
 
-                    if piece.move_set(&self).contains(king) {
-                        self.move_piece(dest, src);
+                    if piece.move_set(&board_copy).contains(king) {
                         return true; 
                     }
                 }  
             }
         }
-        self.move_piece(dest, src);
         return false; 
     }
 
@@ -249,11 +251,14 @@ impl Board {
         let mut piece: Box<dyn Moves>;
         let mut moves: Vec<[i8; 2]>;
 
-
         if !check { 
             return false;
         }
-
+        
+        piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
+        if piece.move_set(&self).len() != 0 {
+            return false;
+        }
 
         // Must check if any piece can protect the king
         for i in 0..8 {
