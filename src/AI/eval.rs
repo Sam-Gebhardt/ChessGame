@@ -79,7 +79,7 @@ fn queen(pos: [i8; 2]) -> i8 {
 
     let QueenTable: [[i8; 8]; 8] = [
         [-20,-10,-10,-5,-5,-10,-10,-20],
-        [-10,  0, 0, 0, 0,  0,   0,-10],
+        [-10,  0, 0,  0, 0,  0,  0,-10],
         [-10,  0, 5,  5, 5,  5,  0,-10],
         [ -5,  0, 5,  5, 5,  5,  0, -5],
         [  0,  0, 5,  5, 5,  5,  0, -5],
@@ -120,9 +120,17 @@ fn king(pos: [i8; 2]) -> i8 {
     //     [-50,-30,-30,-30,-30,-30,-30,-50]];
 
 
-fn table_value(key: i8, pos: [i8; 2]) -> i8 {
+fn table_value(key: i8, pos: [i8; 2], color: i8) -> i8 {
 
-    // Queens/towers don't seem to have positioal advantage
+    /*
+    If a piece is black, its table is flips across the 
+    the y-axis. The pieces should start in the same column 
+    reguardless of color so we can leave them in the same col
+    */
+    if color == -1 {
+        pos[0] = 7 - pos[0];
+    }
+
     let p = match key {
         1 => pawn(pos),
         2 => tower(pos),
@@ -153,9 +161,11 @@ fn base_value(key: i8) -> i32 {
 }
 
 
-// Evaluate the value of a board
-// color: which color to eval the given board for
-//  ie if 1, eval for white, -1 for black 
+/*
+Evaluate the value of a board
+color: which color to eval the given board for
+    ie if 1, eval for white, -1 for black 
+*/
 pub fn eval_board(board: &Board, color: i8) -> i32{
 
     let mut black: i32 = 0;
@@ -173,7 +183,7 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
                 black += base_value(key);
             }
 
-            board_value += table_value(key, [i, j]) as i32;
+            board_value += table_value(key, [i, j], color) as i32;
         }
     }
 
@@ -183,9 +193,3 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
 
     return ((white - black) * -1) + board_value;
 } 
-
-
-// todo:
-// board_val needs to change if color black
-// the tables are currently set for white pieces 
-// that have a starting position of the bottom
