@@ -18,6 +18,20 @@ fn pawn(pos: [i8; 2]) -> i32 {
     return PawnTable[pos[0] as usize][pos[1] as usize];
 }
 
+fn tower(pos: [i8; 2]) -> i32 {
+
+    let TowerTable: [[i8; 2]; 8] = {
+        [0,  0,  0,  0,  0,  0,  0,  0],
+        [5, 10, 10, 10, 10, 10, 10,  5],
+        [-5,  0,  0,  0,  0,  0,  0, -5],
+        [-5,  0,  0,  0,  0,  0,  0, -5],
+        [-5,  0,  0,  0,  0,  0,  0, -5],
+        [-5,  0,  0,  0,  0,  0,  0, -5],
+        [-5,  0,  0,  0,  0,  0,  0, -5],
+        [0,  0,  0,  5,  5,  0,  0,  0]]
+    }
+}
+
 fn knight(pos: [i8; 2]) -> i32 {
 
     let KnightTable: [[i32; 8]; 8] = [
@@ -48,9 +62,23 @@ fn bishop(pos: [i8; 2]) -> i32 {
     return BishopTable[pos[0] as usize][pos[1] as usize];
 }
 
+fn queen(pos: [i8; 2]) -> i32 {
+
+    let QueenTable: [[i8; 8]; 8] = [
+        [-20, -10, -10, -5, -5, -10, -10, -20],
+        [-10, 0, 0, 0, 0, 0, 0, -10],
+        [-10, 0, 5, 5, 5, 5, 0, -10],
+        [-5, 0, 5, 5, 5, 5, 0, -5],
+        [0, 0, 5, 5, 5, 5, 0, -5],
+        [-10, 5, 5, 5, 5, 5, 0, -10],
+        [-10, 0, 5, 0, 0, 0, 0, -10],
+        [-20, -10, -10, -5, -5, -10, -10, -20]]
+    ]
+}
+
 fn king(pos: [i8; 2]) -> i32 {
 
-    let KingTable: [[i32: 8]; 8] = [
+    let KingTable: [[i32; 8]; 8] = [
         [-30, -40, -40, -50, -50, -40, -40, -30],
         [-30, -40, -40, -50, -50, -40, -40, -30],
         [-30, -40, -40, -50, -50, -40, -40, -30],
@@ -79,8 +107,10 @@ fn find_piece(key: i8, pos: [i8; 2]) -> i32 {
     // Queens/towers don't seem to have positioal advantage
     let p = match key {
         1 => pawn(pos),
+        2 => tower(pos),
         3 => knight(pos),
         4 => bishop(pos),
+        5 => queen(pos),
         6 => king(pos), 
         _ => 0
     };
@@ -92,7 +122,7 @@ fn find_piece(key: i8, pos: [i8; 2]) -> i32 {
 // Evaluate the value of a piece based on its type 
 // and position
 pub fn eval_piece(key: i8, pos: [i8; 2]) {
-    
+
     find_piece(key, pos);
 
 } 
