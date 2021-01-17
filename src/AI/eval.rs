@@ -6,10 +6,12 @@ Evaluates the board to find a numerical representation for the strenght of a
 postion. In order to find this number each piece has a base strength along with a positive
 or negative modifier based on their current place on the board.
 
-Score = Material_value(White) – Material_value(Black) + Table_value(All the pieces on board).
+Score = base_value(White) – base_value(Black) + Table_value(All the pieces on board)
+(From black's perspective it's same except * -1)
 
 */
 use crate::board::Board;
+use crate::pieces::sign_checker;
 
 fn pawn(pos: [i8; 2]) -> i8 {
 
@@ -117,7 +119,7 @@ fn king(pos: [i8; 2]) -> i8 {
     //     [-50,-30,-30,-30,-30,-30,-30,-50]];
 
 
-fn find_piece(key: i8, pos: [i8; 2]) -> i8 {
+fn table_value(key: i8, pos: [i8; 2]) -> i8 {
 
     // Queens/towers don't seem to have positioal advantage
     let p = match key {
@@ -150,10 +152,33 @@ fn base_value(key: i8) -> i32 {
 }
 
 
-// Evaluate the value of a piece based on its type 
-// and position
-pub fn eval_board(board: &Board) {
+// Evaluate the value of a board
+// color: which color to eval the given board for
+//  ie if 1, eval for white, -1 for black 
+pub fn eval_board(board: &Board, color: i8) -> i32{
 
-    find_piece(1, [3, 2]);
+    let mut black: i32 = 0;
+    let mut white: i32 = 0; 
+    let mut board_value: i32 = 0;
+    let mut key: i8;
 
+    for i in 0..8 {
+        for j in 0..8 {
+            key = board.get_piece(i, j);
+
+            if key > 0 {
+                white += base_value(key);
+            } else if key < 0 {
+                black += base_value(key);
+            }
+
+            board_value += table_value(key, [i, j]) as i32;
+        }
+    }
+
+    if color == 1 {
+        return (white - black) + board_value;
+    }
+
+    return ((white - black) * -1) + board_value;
 } 
