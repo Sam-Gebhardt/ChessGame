@@ -13,6 +13,7 @@ Score = base_value(White) – base_value(Black) + Table_value(All the pieces on 
 use crate::board::Board;
 use crate::pieces::sign_checker;
 
+
 fn pawn(pos: [i8; 2]) -> i8 {
 
     let PawnTable: [[i8; 8]; 8] = [
@@ -77,14 +78,14 @@ fn bishop(pos: [i8; 2]) -> i8 {
 fn queen(pos: [i8; 2]) -> i8 {
 
     let QueenTable: [[i8; 8]; 8] = [
-        [-20, -10, -10, -5, -5, -10, -10, -20],
-        [-10, 0, 0, 0, 0, 0, 0, -10],
-        [-10, 0, 5, 5, 5, 5, 0, -10],
-        [-5, 0, 5, 5, 5, 5, 0, -5],
-        [0, 0, 5, 5, 5, 5, 0, -5],
-        [-10, 5, 5, 5, 5, 5, 0, -10],
-        [-10, 0, 5, 0, 0, 0, 0, -10],
-        [-20, -10, -10, -5, -5, -10, -10, -20]];
+        [-20,-10,-10,-5,-5,-10,-10,-20],
+        [-10,  0, 0, 0, 0,  0,   0,-10],
+        [-10,  0, 5,  5, 5,  5,  0,-10],
+        [ -5,  0, 5,  5, 5,  5,  0, -5],
+        [  0,  0, 5,  5, 5,  5,  0, -5],
+        [-10,  5, 5,  5, 5,  5,  0,-10],
+        [-10,  0, 5,  0, 0,  0,  0,-10],
+        [-20,-10,-10,-5,-5,-10,-10,-20]];
 
     return QueenTable[pos[0] as usize][pos[1] as usize];
 }
@@ -182,3 +183,9 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
 
     return ((white - black) * -1) + board_value;
 } 
+
+
+// todo:
+// board_val needs to change if color black
+// the tables are currently set for white pieces 
+// that have a starting position of the bottom
