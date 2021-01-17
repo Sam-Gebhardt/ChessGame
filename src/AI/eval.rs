@@ -1,7 +1,15 @@
-/* holds the values for each piece at a specific place on the board
-
+/* 
+https://www.chessprogramming.org/Simplified_Evaluation_Function
 https://www.adamberent.com/2019/03/02/piece-square-table/
+
+Evaluates the board to find a numerical representation for the strenght of a 
+postion. In order to find this number each piece has a base strength along with a positive
+or negative modifier based on their current place on the board.
+
+Score = Material_value(White) – Material_value(Black) + Table_value(All the pieces on board).
+
 */
+use crate::Board:board;
 
 fn pawn(pos: [i8; 2]) -> i32 {
 
@@ -30,6 +38,8 @@ fn tower(pos: [i8; 2]) -> i32 {
         [-5,  0,  0,  0,  0,  0,  0, -5],
         [0,  0,  0,  5,  5,  0,  0,  0]]
     }
+
+    return TowerTable[pos[0] as usize][pos[1] as usize];
 }
 
 fn knight(pos: [i8; 2]) -> i32 {
@@ -74,6 +84,8 @@ fn queen(pos: [i8; 2]) -> i32 {
         [-10, 0, 5, 0, 0, 0, 0, -10],
         [-20, -10, -10, -5, -5, -10, -10, -20]]
     ]
+
+    return QueenTable[pos[0] as usize][pos[1] as usize];
 }
 
 fn king(pos: [i8; 2]) -> i32 {
@@ -90,6 +102,10 @@ fn king(pos: [i8; 2]) -> i32 {
 
         return KingTable[pos[0] as usize][pos[1] as usize];
 }
+
+
+// Both sides have no queens or
+// Every side which has a queen has additionally no other pieces or one minorpiece maximum.
 
     // let KingTableEndGame: [[i32; 8]; 8] = [
     //     [-50,-40,-30,-20,-20,-30,-40,-50],
@@ -119,9 +135,25 @@ fn find_piece(key: i8, pos: [i8; 2]) -> i32 {
 }
 
 
+// The base value of a piece reguardless of position
+fn base_value(key: i8) -> i32 {
+
+    let p = match key {
+        1 => 100,
+        2 => 500,
+        3 => 320,
+        4 => 330,
+        5 => 900,
+        6 => 20000, 
+        _ => 
+    }
+
+}
+
+
 // Evaluate the value of a piece based on its type 
 // and position
-pub fn eval_piece(key: i8, pos: [i8; 2]) {
+pub fn eval_board(board: &Board) {
 
     find_piece(key, pos);
 
