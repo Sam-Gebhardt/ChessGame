@@ -6,7 +6,7 @@ use crate::pieces::Moves;
 use crate::pieces::sign_checker;
 
 
-fn alpha(n: i8) -> char {
+pub fn alpha(n: i8) -> char {
     // Converts index to alpha char
     let a: char = match n {
         0 => 'a',
@@ -165,7 +165,7 @@ impl Board {
 
     fn legal_move(&mut self, src: [i8; 2], dest: [i8; 2]) -> bool {
         // is the inputed move legal
-
+        
         if src[0] > 7 || src[0] < 0 || src[1] > 7 || src[1] < 0 {
             return false
         } else if dest[0] > 7 || dest[0] < 0 || dest[1] > 7 || dest[1] < 0 {
@@ -320,8 +320,3 @@ impl Board {
         return true;
     }
 }
-
-
-//*******************************************************************************************************
-// Test cases for private functions/methods/structs
-
