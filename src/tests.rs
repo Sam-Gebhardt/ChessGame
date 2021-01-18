@@ -10,7 +10,7 @@ mod tests {
     use crate::board::Board;
     use crate::pieces::*;
 
-    // Test functions in board
+    // Tests for board.rs
     #[test]
     fn construct() {
         //Check to make sure board is built correctly
@@ -35,6 +35,8 @@ mod tests {
         assert_eq!(board.b[7], [2, 3, 4, 6, 5, 4, 3, 2]);
     }
 
+    // ***********************************************************************
+    // tests for pieces.rs
     #[test]
     fn pawn_moves() {
         // Test if a pawn has the correct moves based on its pos and key
@@ -127,26 +129,28 @@ mod tests {
         assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], [5, 6], [3, 6], [5, 2], [3, 2]));
 
     }
-    // #[test]
-    // fn bishop_moves() { 
+    #[test]
+    fn bishop_moves() { 
 
-    //     let mut board = Board{
-    //         b: [[0; 8]; 8],
-    //         white: [0, 0],
-    //         black: [0, 0]
-    //     }; 
-    //     board.construct();
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+        board.construct();
 
-    //     let bishop: Bishop = Bishop{pos: [4, 4], key: 4};
-    //     assert_eq!(bishop.move_set(&board), vec!([5, 5], [3, 5], [5, 3], [3, 3], [6, 6], [2, 6], [6, 2], [2, 2]));
+        // Test middle of the board
+        let bishop: Box<dyn Moves> = piece_type(-4, [4, 4]);
+        assert_eq!(bishop.move_set(&board), vec!([5, 5], [3, 5], [5, 3], [3, 3], [6, 6], [2, 6], [6, 2], [2, 2]));
 
-    //     let empty: Vec<[i8; 2]> = Vec::new();
-    //     let bishop_1: Bishop = Bishop{pos: [0, 2], key: 4};
-    //     let bishop_2: Bishop = Bishop{pos: [7, 2], key: -4};
+        // test starting position
+        let bishop_1: Box<dyn Moves> = piece_type(-4, [0, 2]);
+        let bishop_2: Box<dyn Moves> = piece_type(4, [7, 4]);
 
-    //     assert_eq!(bishop_1.move_set(&board), empty);
-    //     assert_eq!(bishop_2.move_set(&board), empty);
-    // }
+        assert_eq!(bishop_1.move_set(&board).len(), 0);
+        assert_eq!(bishop_2.move_set(&board).len(), 0);
+    }
+
     // #[test]
     // fn queen_moves() {
 
@@ -155,6 +159,9 @@ mod tests {
     // fn king_moves() {
         
     // }
+
+    // ***********************************************************************
+    // Tests for AI
 
     // // #[test]
     // // fn check() {
