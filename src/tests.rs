@@ -66,37 +66,36 @@ mod tests {
 
     }
 
-    // #[test] //WORKS WITH PRIVATE
-    // fn tower_moves() {
-    //     // Create a standard board
-    //     let mut board = Board{
-    //         b: [[0; 8]; 8],
-    //         white: [0, 0],
-    //         black: [0, 0]
-    //     }; 
-    //     board.construct();
+    #[test] 
+    fn tower_moves() {
 
-    //     // No possible moves at starting position
-    //     let tower: Tower = Tower{pos: [0, 0], key: 2};
-    //     let tower_1: Tower = Tower{pos: [7, 7], key: -2};
+        // Create a standard board
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+        board.construct();
 
-    //     let empty: Vec<[i8; 2]> = Vec::new();
-    //     assert_eq!(tower.move_set(&board), empty);
-    //     assert_eq!(tower_1.move_set(&board), empty);
+        // No possible moves at starting position
+        let tower: Box<dyn Moves> = piece_type(-2, [0, 0]);
+        assert_eq!(tower.move_set(&board).len(), 0);
 
-    //     board.b[5][3] = 2;
-    //     let tower_2: Tower = Tower{pos: [5, 3], key: -2};
-    //     // test bounds and enemy vs friendly detection
+        // test bounds and enemy vs friendly detection
+        let tower_2: Box<dyn Moves> = piece_type(-2, [5, 3]);
 
-    //     assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [4, 3], [5, 5], 
-    //                                             [5, 1], [3, 3], [5, 6], [5, 0], 
-    //                                             [2, 3], [5, 7], [1, 3]));
+        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [6, 3], [4, 3], 
+                                                  [5, 5], [5, 1], [3, 3], [5, 6], 
+                                                  [5, 0], [2, 3], [5, 7]));
 
-    //     board.b[3][3] = -1;
-    //     board.b[5][1] = 1;
-    //     board.b[5][6] = 1;
-    //     assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [4, 3], [5, 5], [5, 1], [5, 6]));
-    // }
+        board.b[3][3] = -1;
+        board.b[5][1] = 1;
+        board.b[5][6] = 1;
+        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [6, 3], [4, 3], [5, 5], [5, 1], [5, 6]));
+
+        // let tower_1: Box<dyn Moves> = piece_type(2, [7, 7]);
+        // assert_eq!(tower_1.move_set(&board), empty);
+    }
     // #[test]
     // fn knight_moves() {
     //     let mut board = Board{
