@@ -2,6 +2,8 @@
 Unit tests for the game
 
 run with -- --nocapture
+
+todo: write more for queen + King
 */
 
 
@@ -151,10 +153,29 @@ mod tests {
         assert_eq!(bishop_2.move_set(&board).len(), 0);
     }
 
-    // #[test]
-    // fn queen_moves() {
+    #[test]
+    fn queen_moves() {
 
-    // }
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.construct();
+
+        // test starting position
+        let queen: Box<dyn Moves> = piece_type(6, [7, 4]);
+        assert_eq!(queen.move_set(&board).len(), 0);
+
+        // test horizontal and verticle movement
+        let queen_1: Box<dyn Moves> = piece_type(6, [5, 0]);
+        assert_eq!(queen_1.move_set(&board), vec!([[4, 1], [3, 2], [2, 3], [1, 4], 
+                                                   [5, 1], [4, 0], [5, 2], [3, 0], 
+                                                   [5, 3], [2, 0], [5, 4], [1, 0], 
+                                                   [5, 5], [5, 6], [5, 7]]))
+
+    }
     // #[test]
     // fn king_moves() {
         
