@@ -102,7 +102,7 @@ fn king(pos: [i8; 2]) -> i8 {
         [20,  20,   0,   0,   0,   0,  20,  20],
         [20,  30,  10,   0,   0,  10,  30,  20]];
 
-        return KingTable[pos[0] as usize][pos[1] as usize];
+    return KingTable[pos[0] as usize][pos[1] as usize];
 }
 
 
@@ -120,16 +120,7 @@ fn king(pos: [i8; 2]) -> i8 {
     //     [-50,-30,-30,-30,-30,-30,-30,-50]];
 
 
-fn table_value(key: i8, pos: [i8; 2], color: i8) -> i8 {
-
-    /*
-    If a piece is black, its table is flips across the 
-    the y-axis. The pieces should start in the same column 
-    reguardless of color so we can leave them in the same col
-    */
-    if color == -1 {
-        pos[0] = 7 - pos[0];
-    }
+fn table_value(key: i8, pos: [i8; 2]) -> i8 {
 
     let p = match key {
         1 => pawn(pos),
@@ -180,16 +171,18 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
             if key > 0 {
                 white += base_value(key);
             } else if key < 0 {
-                black += base_value(key);
+                black += base_value(key * -1);
             }
 
-            board_value += table_value(key, [i, j], color) as i32;
+            board_value += table_value(key, [i, j]) as i32;
         }
     }
 
     if color == 1 {
+        // println!("White: W-{} B-{} val {}", white, black, board_value);
         return (white - black) + board_value;
     }
+    // println!("Black: W-{} B-{} val {}", white, black, board_value);
 
     return ((white - black) * -1) + board_value;
 } 
