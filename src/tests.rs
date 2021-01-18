@@ -96,37 +96,40 @@ mod tests {
         // let tower_1: Box<dyn Moves> = piece_type(2, [7, 7]);
         // assert_eq!(tower_1.move_set(&board), empty);
     }
+    #[test]
+    fn knight_moves() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+        board.construct();
+
+        // test default pos
+        let knight: Box<dyn Moves> = piece_type(-3, [0, 2]);
+        let knight_1: Box<dyn Moves> = piece_type(3, [7, 6]);
+
+        // starting positions
+        assert_eq!(knight.move_set(&board), vec!([2, 3], [2, 1]));
+        assert_eq!(knight_1.move_set(&board), vec!([5, 7], [5, 5]));
+
+        // test moves with friendly pieces in move pos
+        let knight_2: Box<dyn Moves> = piece_type(-3, [4, 4]);
+        let knight_3: Box<dyn Moves> = piece_type(3, [4, 4]);
+
+        board.b[6][5] = -1;
+        board.b[6][3] = -1;
+        board.b[2][5] = -1;
+        board.b[2][3] = -1;
+
+        assert_eq!(knight_2.move_set(&board), vec!([5, 6], [3, 6], [5, 2], [3, 2]));
+        assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], [5, 6], [3, 6], [5, 2], [3, 2]));
+
+    }
     // #[test]
-    // fn knight_moves() {
-    //     let mut board = Board{
-    //         b: [[0; 8]; 8],
-    //         white: [0, 0],
-    //         black: [0, 0]
-    //     }; 
-    //     board.construct();
+    // fn bishop_moves() { 
 
-    //     // test default pos
-    //     let knight: Knight = Knight{pos: [0, 2], key: 3};
-    //     let knight_1: Knight = Knight{pos: [7, 6], key: -3};
-
-    //     assert_eq!(knight.move_set(&board), vec!([2, 3], [2, 1]));
-    //     assert_eq!(knight_1.move_set(&board), vec!([5, 7], [5, 5]));
-
-    //     // test moves with friendly pieces in move pos
-    //     let knight_2: Knight = Knight{pos: [4, 4], key: 3};
-    //     let knight_3: Knight = Knight{pos: [4, 4], key: -3};
-
-    //     board.b[6][5] = 1;
-    //     board.b[6][3] = 1;
-    //     board.b[2][5] = 1;
-    //     board.b[2][3] = 1;
-
-    //     assert_eq!(knight_2.move_set(&board), vec!([5, 6], [3, 6], [5, 2], [3, 2]));
-    //     assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], [5, 6], [3, 6], [5, 2], [3, 2]));
-
-    // }
-    // #[test]
-    // fn bishop_moves() { WORKS WITH PRIVATE
     //     let mut board = Board{
     //         b: [[0; 8]; 8],
     //         white: [0, 0],
