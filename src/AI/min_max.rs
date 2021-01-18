@@ -49,13 +49,13 @@ fn generate_all_moves(board: &Board) -> Vec<[[i8; 2]; 2]> {
 }
 
 
-fn max(board: &Board, mut alpha: i64, beta: i64, depth: i64) -> i64 {
+fn max(board: &Board, mut alpha: i32, beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return 0; // An eval function that determines the value of the board
+        return eval::eval_board(board, -1);
     }
 
-    let mut score: i64;
+    let mut score: i32;
     let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(board);
 
     for _i in 0..moves.len() {
@@ -71,13 +71,13 @@ fn max(board: &Board, mut alpha: i64, beta: i64, depth: i64) -> i64 {
 }
 
 
-fn min(board: &Board, alpha: i64, mut beta: i64, depth: i64) -> i64{
+fn min(board: &Board, alpha: i32, mut beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return 0 * -1; // An eval function that determines the value of the board
+        return eval::eval_board(board, 1); 
     }
 
-    let mut score: i64;
+    let mut score: i32;
     let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(board);
 
     for _i in 0..moves.len() {
@@ -99,8 +99,8 @@ pub fn select(board: &Board) {
     let board_copy: Board = board.clone();
 
     // Run with a depth of 5 as default
-    let score: i64 = max(&board_copy, -99999, 99999, 5);
-    eval::eval_board(board, 1);
+    let score: i32 = max(&board_copy, -99999, 99999, 5);
+    
     if score > 1 {
         return;
     }
