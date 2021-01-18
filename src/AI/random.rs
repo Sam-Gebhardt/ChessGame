@@ -4,8 +4,16 @@ An opponent that move's are randomly selected
 use crate::pieces::Moves;
 use crate::pieces::piece_type;
 use crate::board::Board;
+use crate::board::alpha;
 extern crate rand;
 use rand::prelude::*;
+
+// prints the chosen move to the screen
+fn print_move(moves: [[i8; 2]; 2]) {
+
+    println!("\nBlack Moved {}{} to {}{}", alpha(moves[0][0]), moves[0][1] + 1,
+                                           alpha(moves[1][0]), moves[1][1] + 1);
+}
 
 pub fn random_move(board: &mut Board) {
     make_move(board);
@@ -15,15 +23,18 @@ fn make_move(board: &mut Board) {
 
     if board.in_check(board.check_mate_helper(), board.check_mate_helper(), -1) {
         let save = block(board);
+        print_move(save);
         board.move_piece(save[0], save[1]);
     } else {
         let _move: [[i8; 2]; 2] = choose_move(board);
+        print_move(_move);
         board.move_piece(_move[0], _move[1]);
     }
 }
 
+
+// Returns a move that protects the king
 fn block(board: &mut Board) -> [[i8; 2]; 2] {
-    // Returns a move that protects the king
 
     let mut saving_moves: Vec<[[i8; 2]; 2]> = Vec::new();
     let mut moves: Vec<[i8; 2]>;
@@ -50,8 +61,9 @@ fn block(board: &mut Board) -> [[i8; 2]; 2] {
     return saving_moves[select];
 }
 
+
+// Choose a move till a valid one is picked
 fn rechoose(board: Board, piece_list: Vec<Box<dyn Moves>>) -> [[i8; 2]; 2] {
-    // Choose a move till a valid one is picked
 
     let mut ran: usize; 
     let mut ran2:usize; 
@@ -66,15 +78,14 @@ fn rechoose(board: Board, piece_list: Vec<Box<dyn Moves>>) -> [[i8; 2]; 2] {
         moves = piece_list[ran].move_set(&board);
         ran2 = thread_rng().gen_range(0, moves.len());
 
-        println!("{:?} and {:?}", piece_list[ran].get_pos(), moves[ran2]);
         if !board_copy.in_check(piece_list[ran].get_pos(), moves[ran2], -1) {
             return [piece_list[ran].get_pos(), moves[ran2]];
         }
     }
 }
 
+// Randomly select a move to make
 fn choose_move(board: &mut Board) -> [[i8; 2]; 2] {
-    // Opponent will always be black pieces
 
     let mut piece_list: Vec<Box<dyn Moves>> = Vec::new();
     let mut piece: Box<dyn Moves>;
