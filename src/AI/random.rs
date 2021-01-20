@@ -8,6 +8,7 @@ use crate::board::alpha;
 extern crate rand;
 use rand::prelude::*;
 
+
 // prints the chosen move to the screen
 pub fn print_move(moves: [[i8; 2]; 2]) {
 
@@ -18,6 +19,7 @@ pub fn print_move(moves: [[i8; 2]; 2]) {
 pub fn random_move(board: &mut Board) {
     make_move(board);
 }
+
 
 fn make_move(board: &mut Board) {
 
