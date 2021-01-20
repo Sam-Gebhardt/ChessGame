@@ -9,7 +9,7 @@ extern crate rand;
 use rand::prelude::*;
 
 // prints the chosen move to the screen
-fn print_move(moves: [[i8; 2]; 2]) {
+pub fn print_move(moves: [[i8; 2]; 2]) {
 
     println!("\nBlack Moved {}{} to {}{}", alpha(moves[0][0]), moves[0][1] + 1,
                                            alpha(moves[1][0]), moves[1][1] + 1);
