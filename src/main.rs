@@ -1,25 +1,29 @@
 mod pieces;
 mod board;
+// mod gui;
+// mod graphics;
+mod tests;
+#[allow(unused_imports)]
 use AI::random::random_move;
+use AI::min_max::select;
 #[allow(non_snake_case)]
-mod AI { pub mod random; }
+#[allow(unused_imports)]
+#[allow(dead_code)]
+mod AI { pub mod random; pub mod min_max; pub mod eval; }
 
-
-// use crate::pieces::Moves;
-// use crate::board;
 
 /*
 Board construction:
       a      b       c       d       e       f       g       h
 ----------------------------------------------------------------
-1|    2      3       4       5       6       4       3       2
-2|    1      1       1       1       1       1       1       1 
+1|   -2     -3      -4      -6      -5      -4      -3      -2
+2|   -1     -1      -1      -1      -1      -1      -1      -1
 3|    0      0       0       0       0       0       0       0
 4|    0      0       0       0       0       0       0       0
 5|    0      0       0       0       0       0       0       0
 6|    0      0       0       0       0       0       0       0
-7|    -1     -1      -1      -1      -1      -1      -1      -1
-8|    -2     -3      -4      -6      -5      -4      -3      -2
+7|    1      1       1       1       1       1       1       1 
+8|    2      3       4       5       6       4       3       2
 
 w = positive
 b = negative
@@ -43,10 +47,7 @@ fn main() {
     }; 
 
     // Construct the board
-    // board.construct();
-    board.b[1][3] = 2;
-    board.b[0][0] = -5;
-    board.b[5][1] = 2; 
+    board.construct();
 
     // print the starting board
     board.print_b();
@@ -66,7 +67,10 @@ fn main() {
         }
 
         // An opponent that chooses a random piece to move
-        random_move(&mut board);
+        // random_move(&mut board);
+
+        // Move for min/max algo
+        select(&mut board);
 
         if board.check_mate(1) {
             println!("Game over! \nBlack wins");
@@ -80,3 +84,6 @@ fn main() {
         board.print_b();
     }
 }
+
+
+
