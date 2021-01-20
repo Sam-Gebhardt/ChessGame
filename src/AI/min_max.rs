@@ -1,16 +1,18 @@
 /*
 Chess AI that is built upon min/max with alpha pruning 
+
 https://www.chessprogramming.org/Minimax
 https://www.chessprogramming.org/Alpha-Beta
-
 https://vitcapstoneproject.wordpress.com/2018/02/26/evaluating-a-board-position/
 
 */
 
 use crate::board::Board;
 use crate::pieces::piece_type;
+use crate::pieces::sign_checker;
 use crate::pieces::Moves;
 use crate::AI::eval;
+use crate::AI::random::print_move;
 
 
 // takes a move_set vec and adds the src to each move 
@@ -27,8 +29,8 @@ fn add_source(src: [i8; 2], move_set: Vec<[i8; 2]>) -> Vec<[[i8; 2]; 2]> {
 }
 
 
-// Generate all the moves for the AI controlled pieces
-fn generate_all_moves(board: &Board) -> Vec<[[i8; 2]; 2]> {
+// Generate all the moves for the pieces speciefed by color
+fn generate_all_moves(board: &Board, color: i8) -> Vec<[[i8; 2]; 2]> {
 
     let mut piece: Box<dyn Moves>;
     let mut moves: Vec<[[i8; 2]; 2]> = Vec::new();
@@ -38,32 +40,37 @@ fn generate_all_moves(board: &Board) -> Vec<[[i8; 2]; 2]> {
         for j in 0..8 {
 
             key = board.get_piece(i, j);
-            if key < 0 { 
+            if sign_checker(key, color) { 
+
                 piece = piece_type(key, [i, j]);
                 moves.append(&mut add_source([i, j], piece.move_set(board)));
             }
         }
     }
-
     return moves;
 }
 
 
-fn max(board: &Board, mut alpha: i32, beta: i32, depth: i32) -> i32 {
+fn max(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], mut alpha: i32, beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return eval::eval_board(board, -1);
+        return eval::eval_board(&board, -1);
     }
 
     let mut score: i32;
-    let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(board);
+    let mut board_copy: Board;
+    let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(&board, -1);
 
-    for _i in 0..moves.len() {
-        score = min(board, alpha, beta, depth - 1);
+    for i in 0..moves.len() {
+
+        board_copy = board.clone();
+        board_copy.move_piece(moves[i][0], moves[i][1]);
+        score = min(board_copy, &mut best, alpha, beta, depth - 1);
 
         if score >= beta {
             return beta;
         } else if score > alpha {
+            best[0] = moves[i];
             alpha = score;
         }
     }
@@ -71,37 +78,54 @@ fn max(board: &Board, mut alpha: i32, beta: i32, depth: i32) -> i32 {
 }
 
 
-fn min(board: &Board, alpha: i32, mut beta: i32, depth: i32) -> i32 {
+fn min(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], alpha: i32, mut beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return eval::eval_board(board, 1); 
+        return eval::eval_board(&board, 1) * -1; 
     }
 
     let mut score: i32;
-    let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(board);
+    let mut board_copy: Board;
+    let moves: Vec<[[i8; 2]; 2]> = generate_all_moves(&board, 1);
 
-    for _i in 0..moves.len() {
-        score = max(board, alpha, beta, depth - 1);
+    for i in 0..moves.len() {
+
+        board_copy = board.clone();
+        board_copy.move_piece(moves[i][0], moves[i][1]);
+        score = max(board_copy, &mut best, alpha, beta, depth - 1);
 
         if score <= alpha {
             return alpha;
         } else if score < beta {
+            best[1] = moves[i]; 
             beta = score;
         }
     }
+
     return beta;
 }
 
 
-pub fn select(board: &Board) {
-    // Driver code
+pub fn select(board: &mut Board) {
 
     let board_copy: Board = board.clone();
 
-    // Run with a depth of 5 as default
-    let score: i32 = max(&board_copy, -99999, 99999, 5);
-    
-    if score > 1 {
-        return;
-    }
+    // the best move will be the first element in the vector
+    let mut best_move: [[[i8; 2]; 2]; 2] = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]];
+
+    // Run with a depth of 3 as default
+    let _score: i32 = max(board_copy, &mut best_move, -99999, 99999, 3);
+     
+    board.move_piece(best_move[0][0], best_move[0][1]);
+    print_move(best_move[0]);
+    // return best_move[0];
 }
+
+/*
+Todo:
+Copying the board each time has a lot of over head, 
+tmp move piece each time then reset?
+
+Can make general improvements:
+    * See if the move puts the player in check
+*/
