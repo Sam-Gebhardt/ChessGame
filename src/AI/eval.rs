@@ -41,7 +41,6 @@ fn tower(pos: [i8; 2]) -> i8 {
         [-5,  0,  0,  0,  0,  0,  0, -5],
         [0,  0,  0,  5,  5,  0,  0,  0]];
     
-
     return TowerTable[pos[0] as usize][pos[1] as usize];
 }
 
@@ -144,8 +143,8 @@ fn base_value(key: i8) -> i32 {
         2 => 500,
         3 => 320,
         4 => 330,
-        5 => 900,
-        6 => 20000, 
+        5 => 20000, //king is 5, queen is 6
+        6 => 900, 
         _ =>  100
     };
     return p;
@@ -179,10 +178,8 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
     }
 
     if color == 1 {
-        // println!("White: W-{} B-{} val {}", white, black, board_value);
         return (white - black) + board_value;
     }
-    // println!("Black: W-{} B-{} val {}", white, black, board_value);
 
     return ((white - black) * -1) + board_value;
 } 
