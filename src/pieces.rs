@@ -351,6 +351,3 @@ Move piece_type to board
 Fix random by calling in_check in choose_move
 */
 
-// *************************************************************************************
-// Test cases for private functions/structs
-
