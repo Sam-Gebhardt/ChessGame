@@ -95,7 +95,8 @@ mod tests {
         board.b[3][3] = -1;
         board.b[5][1] = 1;
         board.b[5][6] = 1;
-        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [6, 3], [4, 3], [5, 5], [5, 1], [5, 6]));
+        assert_eq!(tower_2.move_set(&board), vec!([5, 4], [5, 2], [6, 3], [4, 3], 
+                                                  [5, 5], [5, 1], [5, 6]));
 
         // let tower_1: Box<dyn Moves> = piece_type(2, [7, 7]);
         // assert_eq!(tower_1.move_set(&board), empty);
@@ -128,7 +129,8 @@ mod tests {
         board.b[2][3] = -1;
 
         assert_eq!(knight_2.move_set(&board), vec!([5, 6], [3, 6], [5, 2], [3, 2]));
-        assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], [5, 6], [3, 6], [5, 2], [3, 2]));
+        assert_eq!(knight_3.move_set(&board), vec!([2, 5], [2, 3], [6, 5], [6, 3], 
+                                                   [5, 6], [3, 6], [5, 2], [3, 2]));
 
     }
     #[test]
@@ -143,7 +145,8 @@ mod tests {
 
         // Test middle of the board
         let bishop: Box<dyn Moves> = piece_type(-4, [4, 4]);
-        assert_eq!(bishop.move_set(&board), vec!([5, 5], [3, 5], [5, 3], [3, 3], [6, 6], [2, 6], [6, 2], [2, 2]));
+        assert_eq!(bishop.move_set(&board), vec!([5, 5], [3, 5], [5, 3], [3, 3],
+                                                 [6, 6], [2, 6], [6, 2], [2, 2]));
 
         // test starting position
         let bishop_1: Box<dyn Moves> = piece_type(-4, [0, 2]);
@@ -170,48 +173,93 @@ mod tests {
 
         // test horizontal and verticle movement
         let queen_1: Box<dyn Moves> = piece_type(6, [5, 0]);
-        assert_eq!(queen_1.move_set(&board), vec!([[4, 1], [3, 2], [2, 3], [1, 4], 
-                                                   [5, 1], [4, 0], [5, 2], [3, 0], 
-                                                   [5, 3], [2, 0], [5, 4], [1, 0], 
-                                                   [5, 5], [5, 6], [5, 7]]))
+        assert_eq!(queen_1.move_set(&board), vec!([4, 1], [3, 2], [2, 3], [1, 4], 
+                                                  [5, 1], [4, 0], [5, 2], [3, 0], 
+                                                  [5, 3], [2, 0], [5, 4], [1, 0], 
+                                                  [5, 5], [5, 6], [5, 7]));
 
     }
-    // #[test]
-    // fn king_moves() {
-        
-    // }
+    #[test]
+    fn king_moves() {
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.construct();
+
+        // Starting pos should be empty
+        let king: Box<dyn Moves> = piece_type(5, [7, 3]);
+        assert_eq!(king.move_set(&board).len(), 0);
+
+        // The pieces don't detect in check so I'm not putting 
+        // those in this test case
+
+        let king_1: Box<dyn Moves> = piece_type(5, [5, 0]);
+        let king_2: Box<dyn Moves> = piece_type(-5, [4, 4]);
+
+        assert_eq!(king_1.move_set(&board), vec!([4, 0], [4, 1], [5, 1]));
+        assert_eq!(king_2.move_set(&board), vec!([5, 4], [5, 3], [4, 3], [3, 3], 
+                                                 [3, 4], [3, 5], [4, 5], [5, 5]));
+    }
+
 
     // ***********************************************************************
-    // Tests for AI
+    // Tests for Board
 
-    // // #[test]
-    // // fn check() {
-    // //     let mut board = Board{
-    // //         b: [[0; 8]; 8],
-    // //         white: [0, 0],
-    // //         black: [0, 0]
-    // //     }; 
+    #[test]
+    fn in_check() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
     
-    // //     board.construct();
-    // //     board.b[1][3] = -2;
+        board.construct();
+        board.b[1][3] = 2;
     
-    // //     assert_eq!(board.in_check([0, 0], [0, 0]), true);
+        assert_eq!(board.in_check([3, 3], [3, 3], -1), true);
+
+        board.b[1][3] = 0;
+        board.b[3][2] = 2;
+        assert_eq!(board.in_check([3, 2], [1, 3], -1), true);
+
+        // reset board to all 0
+        board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.b[0][0] = 5;
+        board.b[2][2] = -2;
+        board.b[1][7] = -2;
+
+        assert_eq!(board.in_check([7, 7], [7, 7], 1), false);
+        assert_eq!(board.in_check([2, 2], [0, 2], 1), true);
+
+
     
-    // // }
-    // // fn mate() {
-    // //     let mut board = Board{
-    // //         b: [[0; 8]; 8],
-    // //         white: [0, 0],
-    // //         black: [0, 0]
-    // //     }; 
+    }
+    // Check mate is currently buggy, so Ill wait 
+    // to implement a test case till its working
+
+    // fn mate() {
+    //     let mut board = Board{
+    //         b: [[0; 8]; 8],
+    //         white: [0, 0],
+    //         black: [0, 0]
+    //     }; 
     
-    // //     board.b[0][0] = 5;
-    // //     assert_eq!(board.check_mate(), false);
-    // //     board.b[2][0] = -6;
-    // //     board.b[0][2] = -6;
-    // //     board.b[2][2] = -6;
-    // //     assert_eq!(board.check_mate(), true);
-    // // }
+    //     board.b[0][0] = 5;
+    //     assert_eq!(board.check_mate(), false);
+    //     board.b[2][0] = -6;
+    //     board.b[0][2] = -6;
+    //     board.b[2][2] = -6;
+    //     assert_eq!(board.check_mate(), true);
+    // }
     // #[test]
     // fn stale() {
     //     let mut board = Board{
@@ -240,6 +288,7 @@ mod tests {
 
         // Black and white should have the same starting val
         assert_eq!(eval_board(&board, 1), eval_board(&board, -1));
-
     }
 }
+
+
