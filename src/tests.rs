@@ -209,6 +209,26 @@ mod tests {
     // Tests for Board
 
     #[test]
+    fn move_piece() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+    
+        board.construct();
+
+        // move isn't possible, but checking that King's
+        // pos is correctly tracked
+        board.move_piece([0, 3], [3, 3]);
+        assert_eq!(board.black, [3, 3]);
+        assert_eq!(board.b[0], [-2, -3, -4, 0, -6, -4, -3, -2]);
+        assert_eq!(board.b[3], [0, 0, 0, -5, 0, 0, 0, 0]);
+
+    }
+
+    #[test]
     fn in_check() {
 
         let mut board = Board{
@@ -272,6 +292,7 @@ mod tests {
 
     // }
 
+    // *************************************************************
     // Testing functions in the AI directory
     use crate::AI::eval::eval_board;
 
@@ -292,3 +313,11 @@ mod tests {
 }
 
 
+/* Functions to test:
+ *
+ * board:
+ * alpha, numeric
+ * get_piece, move_piece
+ *  check_mate(fix this), stalemate
+ 
+ */
