@@ -305,19 +305,26 @@ mod tests {
             black: [0, 0]
         }; 
 
+        board.b[0][0] = 5;
+        assert_eq!(eval_board(&board, 1), 19980);
+        assert_eq!(eval_board(&board, -1), -20020);
+
+        board.b[3][6] = -6;
+        assert_eq!(eval_board(&board, 1), 19080);
+        assert_eq!(eval_board(&board, -1), -19120);
+
         board.construct();
+        board.b[3][6] = 0;
 
         // Black and white should have the same starting val
         assert_eq!(eval_board(&board, 1), eval_board(&board, -1));
+
+
+
     }
 }
 
 
 /* Functions to test:
- *
- * board:
- * alpha, numeric
- * get_piece, move_piece
- *  check_mate(fix this), stalemate
- 
+  check_mate(fix this), stalemate 
  */
