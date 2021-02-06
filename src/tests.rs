@@ -307,11 +307,11 @@ mod tests {
 
         board.b[0][0] = 5;
         assert_eq!(eval_board(&board, 1), 19980);
-        assert_eq!(eval_board(&board, -1), -20020);
+        assert_eq!(eval_board(&board, -1), 20000);
 
         board.b[3][6] = -6;
         assert_eq!(eval_board(&board, 1), 19080);
-        assert_eq!(eval_board(&board, -1), -19120);
+        assert_eq!(eval_board(&board, -1), 19070);
 
         board.construct();
         board.b[3][6] = 0;
