@@ -51,10 +51,10 @@ fn generate_all_moves(board: &Board, color: i8) -> Vec<[[i8; 2]; 2]> {
 }
 
 
-fn max(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], mut alpha: i32, beta: i32, depth: i32) -> i32 {
+fn max(board: Board, mut best: &mut [[i8; 2]; 2], mut alpha: i32, beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return eval::eval_board(&board, -1);
+        return eval::eval_board(&board, 1);
     }
 
     let mut score: i32;
@@ -69,8 +69,8 @@ fn max(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], mut alpha: i32, beta: i32
 
         if score >= beta {
             return beta;
-        } else if score > alpha {
-            best[0] = moves[i];
+        } if score > alpha {
+            *best = moves[i];
             alpha = score;
         }
     }
@@ -78,10 +78,10 @@ fn max(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], mut alpha: i32, beta: i32
 }
 
 
-fn min(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], alpha: i32, mut beta: i32, depth: i32) -> i32 {
+fn min(board: Board, mut best: &mut [[i8; 2]; 2], alpha: i32, mut beta: i32, depth: i32) -> i32 {
 
     if depth == 0 {
-        return eval::eval_board(&board, 1) * -1; 
+        return eval::eval_board(&board, -1); 
     }
 
     let mut score: i32;
@@ -96,8 +96,7 @@ fn min(board: Board, mut best: &mut [[[i8; 2]; 2]; 2], alpha: i32, mut beta: i32
 
         if score <= alpha {
             return alpha;
-        } else if score < beta {
-            best[1] = moves[i]; 
+        } if score < beta {
             beta = score;
         }
     }
@@ -111,13 +110,13 @@ pub fn select(board: &mut Board) {
     let board_copy: Board = board.clone();
 
     // the best move will be the first element in the vector
-    let mut best_move: [[[i8; 2]; 2]; 2] = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]];
+    let mut best_move: [[i8; 2]; 2] = [[0, 0], [0, 0]];
 
     // Run with a depth of 3 as default
-    let _score: i32 = max(board_copy, &mut best_move, -99999, 99999, 3);
+    let _score: i32 = max(board_copy, &mut best_move, -9999999, 9999999, 3);
      
-    board.move_piece(best_move[0][0], best_move[0][1]);
-    print_move(best_move[0]);
+    board.move_piece(best_move[0], best_move[1]);
+    print_move(best_move);
     // return best_move[0];
 }
 
@@ -125,6 +124,9 @@ pub fn select(board: &mut Board) {
 Todo:
 Copying the board each time has a lot of over head, 
 tmp move piece each time then reset?
+
+Moves are being made that from future board:
+    *Need to save the first move that leads to the best board
 
 Can make general improvements:
     * See if the move puts the player in check
