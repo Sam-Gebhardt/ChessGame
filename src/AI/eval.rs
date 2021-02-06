@@ -119,15 +119,21 @@ fn king(pos: [i8; 2]) -> i8 {
     //     [-50,-30,-30,-30,-30,-30,-30,-50]];
 
 
-fn table_value(key: i8, pos: [i8; 2]) -> i8 {
+fn table_value(key: i8, pos: [i8; 2], color: i8) -> i8 {
+
+    let mut fixed_pos: [i8; 2] = pos;
+    if (color == -1) {
+        fixed_pos[0] = 7 - pos[0]; 
+
+    }
 
     let p = match key {
-        1 => pawn(pos),
-        2 => tower(pos),
-        3 => knight(pos),
-        4 => bishop(pos),
-        5 => queen(pos),
-        6 => king(pos), 
+        1 => pawn(fixed_pos),
+        2 => tower(fixed_pos),
+        3 => knight(fixed_pos),
+        4 => bishop(fixed_pos),
+        5 => queen(fixed_pos),
+        6 => king(fixed_pos), 
         _ => 0
     };
     
@@ -173,13 +179,9 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
                 black += base_value(key * -1);
             }
 
-            board_value += table_value(key, [i, j]) as i32;
+            board_value += table_value(key, [i, j], color) as i32;
         }
     }
 
-    if color == 1 {
-        return (white - black) + board_value;
-    }
-
-    return ((white - black) * -1) + board_value;
+    return (white - black) + board_value;
 } 
