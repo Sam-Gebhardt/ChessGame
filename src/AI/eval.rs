@@ -124,7 +124,6 @@ fn table_value(key: i8, pos: [i8; 2], color: i8) -> i8 {
     let mut fixed_pos: [i8; 2] = pos;
     if (color == -1) {
         fixed_pos[0] = 7 - pos[0]; 
-
     }
 
     let p = match key {
@@ -166,7 +165,8 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
 
     let mut black: i32 = 0;
     let mut white: i32 = 0; 
-    let mut board_value: i32 = 0;
+    let mut w_board_value: i32 = 0;
+    let mut b_board_value: i32 = 0;
     let mut key: i8;
 
     for i in 0..8 {
@@ -175,13 +175,19 @@ pub fn eval_board(board: &Board, color: i8) -> i32{
 
             if key > 0 {
                 white += base_value(key);
+                w_board_value += table_value(key, [i, j], 1) as i32;
+
             } else if key < 0 {
                 black += base_value(key * -1);
-            }
+                b_board_value += table_value(key * -1, [i, j], -1) as i32;
 
-            board_value += table_value(key, [i, j], color) as i32;
+            }
         }
     }
 
-    return (white - black) + board_value;
+    if color == 1 {
+        return (white - black) + w_board_value;
+    }
+
+    return (white - black) + b_board_value;
 } 
