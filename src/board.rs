@@ -301,27 +301,48 @@ impl Board {
         return [0, 0];
     }
 
-    #[allow(dead_code)]
-    pub fn stalemate(&self, key: i8) -> bool {
+    // Same as check_mate except the king can't be in check
+    pub fn stalemate(&mut self, key: i8) -> bool {
         // no legal moves, but not in check
         // key should be the sign of who's turn it is 
+
+        let helper = self.check_mate_helper();
+        let pos: [i8; 2] = if key > 0 {self.white} else {self.black};
 
         let mut piece: Box<dyn Moves>;
         let mut moves: Vec<[i8; 2]>;
 
-        // loop through the board, if a piece has a move then there is no stalemate
+        if self.in_check(helper, helper, key) { 
+            return false;
+        }
+
+        // Need to check if the moves put the king in check because
+        // king.move_set only returns moves in bounds of bound and
+        // doesn't look for checks
+        piece = piece_type(self.get_piece(pos[0], pos[1]), pos);
+        moves = piece.move_set(&self);
+        for i in 0..moves.len() {
+            if !self.in_check(piece.get_pos(), moves[i], key) {
+                return false;
+            }
+        }
+
+        // Must check if any piece can protect the king
         for i in 0..8 {
             for j in 0..8 {
                 if sign_checker(self.get_piece(i, j), key) {
                     piece = piece_type(self.get_piece(i, j), [i, j]);
                     moves = piece.move_set(&self);
 
-                    if moves.len() != 0 { 
-                        return false;
+                    for a in 0..moves.len() {
+                        if !self.in_check(piece.get_pos(), moves[a], key) {
+                            return false;
+                        }
                     }
-                } 
+                }
             }
         }
-        return true;
+
+        return true; 
     }
 }
