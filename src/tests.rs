@@ -1,9 +1,8 @@
 /*
 Unit tests for the game
 
-run with -- --nocapture
+run with:  "-- --nocapture"
 
-todo: write more for queen + King
 */
 
 
@@ -265,32 +264,38 @@ mod tests {
     }
     // Check mate is currently buggy, so Ill wait 
     // to implement a test case till its working
-
-    // fn mate() {
-    //     let mut board = Board{
-    //         b: [[0; 8]; 8],
-    //         white: [0, 0],
-    //         black: [0, 0]
-    //     }; 
+    #[test]
+    fn mate() {
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
     
-    //     board.b[0][0] = 5;
-    //     assert_eq!(board.check_mate(), false);
-    //     board.b[2][0] = -6;
-    //     board.b[0][2] = -6;
-    //     board.b[2][2] = -6;
-    //     assert_eq!(board.check_mate(), true);
-    // }
-    // #[test]
-    // fn stale() {
-    //     let mut board = Board{
-    //         b: [[0; 8]; 8],
-    //         white: [0, 0],
-    //         black: [0, 0]
-    //     }; 
-    //     board.construct();
-    //     assert_eq!(board.stalemate(), false)
+        board.b[0][0] = 5;
+        assert_eq!(board.check_mate(5), false);
+        board.b[2][0] = -6;
+        board.b[0][2] = -6;
+        board.b[2][2] = -6;
+        assert_eq!(board.check_mate(5), true);
+    }
+    #[test]
+    fn stale() {
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
 
-    // }
+        board.b[0][0] = 5;
+        board.b[1][7] = -2;
+        board.b[7][1] = -2;
+        assert_eq!(board.stalemate(1), true);
+
+        board.construct();
+        assert_eq!(board.stalemate(1), false)
+
+    }
 
     // *************************************************************
     // Testing functions in the AI directory
@@ -307,11 +312,11 @@ mod tests {
 
         board.b[0][0] = 5;
         assert_eq!(eval_board(&board, 1), 19980);
-        assert_eq!(eval_board(&board, -1), 20000);
+        assert_eq!(eval_board(&board, -1), -20000);
 
         board.b[3][6] = -6;
         assert_eq!(eval_board(&board, 1), 19080);
-        assert_eq!(eval_board(&board, -1), 19070);
+        assert_eq!(eval_board(&board, -1), -19130);
 
         board.construct();
         board.b[3][6] = 0;
