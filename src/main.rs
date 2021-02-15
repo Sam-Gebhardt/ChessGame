@@ -1,15 +1,14 @@
 mod pieces;
 mod board;
-// mod gui;
-// mod graphics;
-mod tests;
+mod test_board;
+mod test_pieces;
 #[allow(unused_imports)]
 use AI::random::random_move;
 use AI::min_max::select;
 #[allow(non_snake_case)]
 #[allow(unused_imports)]
 #[allow(dead_code)]
-mod AI { pub mod random; pub mod min_max; pub mod eval; }
+mod AI { pub mod random; pub mod min_max; pub mod eval; pub mod test_AI; }
 
 
 /*
@@ -84,6 +83,3 @@ fn main() {
         board.print_b();
     }
 }
-
-
-
