@@ -126,6 +126,27 @@ mod tests {
     }
 
     #[test]
+    fn complex_checkmate_2() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.construct();
+
+        board.b[1][1] = 0;
+        board.b[1][2] = 0;
+        board.b[1][3] = -1;
+        board.b[2][2] = -1;
+        board.b[4][3] = 1;
+        board.b[6][3] = 0;
+
+        board.check_mate(-5);
+
+    }
+    #[test]
     fn stalemate_simple() {
         let mut board = Board{
             b: [[0; 8]; 8],
