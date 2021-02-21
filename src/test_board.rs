@@ -83,8 +83,6 @@ mod tests {
         assert_eq!(board.in_check([7, 7], [7, 7], 1), false);
         assert_eq!(board.in_check([2, 2], [0, 2], 1), true);
 
-
-    
     }
     // Check mate is currently buggy, so Ill wait 
     // to implement a test case till its working
@@ -126,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn complex_checkmate_2() {
+    fn checkmate_complex_2() {
 
         let mut board = Board{
             b: [[0; 8]; 8],
@@ -136,6 +134,7 @@ mod tests {
 
         board.construct();
 
+        // fool's checkmate
         board.b[1][1] = 0;
         board.b[1][2] = 0;
         board.b[1][3] = -1;
@@ -162,5 +161,24 @@ mod tests {
         board.construct();
         assert_eq!(board.stalemate(1), false);
 
+    }
+    #[test]
+    fn stalemate_complex() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.b[0][6] = -5;
+        board.b[1][0] = -4;
+        board.b[4][5] = -1;
+        board.b[5][7] = -1;
+
+        board.b[6][7] = 1;
+        board.b[7][7] = 5;
+
+        // assert_eq!(board.stalemate(1), false);
     }
 }
