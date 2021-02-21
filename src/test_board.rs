@@ -32,7 +32,7 @@ mod tests {
     }
 
     #[test]
-    fn move_piece() {
+    fn king_tracker() {
 
         let mut board = Board{
             b: [[0; 8]; 8],
@@ -89,7 +89,7 @@ mod tests {
     // Check mate is currently buggy, so Ill wait 
     // to implement a test case till its working
     #[test]
-    fn mate() {
+    fn checkmate_simple() {
         let mut board = Board{
             b: [[0; 8]; 8],
             white: [0, 0],
@@ -126,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn stale() {
+    fn stalemate_simple() {
         let mut board = Board{
             b: [[0; 8]; 8],
             white: [0, 0],
