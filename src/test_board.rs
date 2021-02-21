@@ -1,10 +1,6 @@
 /*
-Unit tests for the game
-
 run with:  "-- --nocapture"
-
 */
-
 
 #[cfg(test)]
 mod tests {
@@ -107,6 +103,28 @@ mod tests {
         board.b[2][2] = -6;
         assert_eq!(board.check_mate(5), true);
     }
+
+    #[test]
+    fn checkmate_complex() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        // David and Goliath Mate
+        board.b[2][1] = 2;
+        board.b[5][5] = 5;
+        board.b[5][6] = 1;
+        board.b[5][7] = 1;
+
+        board.b[3][5] = -1;
+        board.b[3][7] = -1;
+        board.b[3][6] = -5;
+
+    }
+
     #[test]
     fn stale() {
         let mut board = Board{
@@ -124,6 +142,4 @@ mod tests {
         assert_eq!(board.stalemate(1), false);
 
     }
-
 }
-
