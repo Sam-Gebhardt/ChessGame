@@ -107,7 +107,7 @@ mod tests {
         board.b[0][6] = 0;
         board.b[5][0] = -3;
         board.b[4][4] = 6;
-        
+
 
         // test 10 random moves
         for _j in 0..10 {
@@ -129,5 +129,29 @@ mod tests {
             }
         }
         assert_eq!(true, true);
+    }
+
+    #[test]
+    fn min_max_open() {
+
+
+    }
+
+    #[test]
+    fn min_max_random() {
+
+
+    }
+
+    #[test]
+    fn min_max_checkmate() {
+
+
+    }
+
+    #[test]
+    fn min_max_save() {
+
+        
     }
 }
