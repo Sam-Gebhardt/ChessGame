@@ -57,6 +57,39 @@ mod tests {
     }
 
     #[test]
+    fn random_opponent_starting() {
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.construct();
+
+        // test 10 random moves
+        for _j in 0..10 {
+
+            let mut valid = false;
+            let out: [[i8; 2]; 2] = random::choose_move(&mut board);
+            let num = board.get_piece(out[0][0], out[0][1]);
+            let moves: Vec<[i8; 2]> = (piece_type(num, out[0])).move_set(&board);
+
+            for i in 0..moves.len() {
+                if out[1] == moves[i] {
+                    valid = true;
+                    break;
+                }
+            }
+            board.print_b();
+            if !valid { 
+                assert_eq!(false, true);
+            }
+        }
+        assert_eq!(true, true);
+    }
+
+    #[test]
     fn random_opponent() {
 
         let mut board = Board{
@@ -67,26 +100,34 @@ mod tests {
 
         board.construct();
 
-        // gen all moves for white
+        // Move some pieces around
+        board.b[0][0] = 0;
+        board.b[1][0] = 0;
+        board.b[3][4] = -2;
+        board.b[0][6] = 0;
+        board.b[5][0] = -3;
+        board.b[4][4] = 6;
+        
 
+        // test 10 random moves
         for _j in 0..10 {
 
             let mut valid = false;
             let out: [[i8; 2]; 2] = random::choose_move(&mut board);
-            let moves: Vec<[i8; 2]> = (piece_type(-1, out[0])).move_set(&board);
+            let num = board.get_piece(out[0][0], out[0][1]);
+            let moves: Vec<[i8; 2]> = (piece_type(num, out[0])).move_set(&board);         
 
             for i in 0..moves.len() {
                 if out[1] == moves[i] {
-                    //println!("{:?} {:?}", out[1], moves);
                     valid = true;
                     break;
                 }
             }
-            //println!("{:?} {:?}", out[1], moves);
+            board.print_b();
             if !valid { 
-                // assert_eq!(false, true);
+                assert_eq!(false, true);
             }
         }
-
+        assert_eq!(true, true);
     }
 }
