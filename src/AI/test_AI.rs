@@ -125,7 +125,7 @@ mod tests {
             }
             board.print_b();
             if !valid { 
-                assert_eq!(false, true);
+                assert!(false);
             }
         }
         assert_eq!(true, true);
@@ -152,6 +152,6 @@ mod tests {
     #[test]
     fn min_max_save() {
 
-        
+
     }
 }
