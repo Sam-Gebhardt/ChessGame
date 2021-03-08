@@ -2,6 +2,7 @@
 mod tests {
 
     use crate::AI::eval::eval_board;
+    use crate::AI::min_max::select;
     use crate::AI::random;
     use crate::board::Board;
     use crate::pieces::piece_type;
@@ -123,17 +124,31 @@ mod tests {
                     break;
                 }
             }
-            board.print_b();
+
             if !valid { 
                 assert!(false);
             }
         }
-        assert_eq!(true, true);
+        assert!(true);
     }
 
     #[test]
     fn min_max_open() {
 
+        // AI should take best possible move
+
+        let mut board = Board{
+            b: [[0; 8]; 8],
+            white: [0, 0],
+            black: [0, 0]
+        }; 
+
+        board.construct();
+        board.move_piece([6, 3], [5, 3]);
+
+        select(&mut board);
+        assert_eq!(board.b[1], [-1, -1, -1, 0, -1, -1, -1, -1]);
+        assert_eq!(board.b[3], [0, 0, 0, -1, 0, 0, 0, 0]);
 
     }
 
